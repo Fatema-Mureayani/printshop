@@ -1,0 +1,12 @@
+import pool from "./db";
+
+async function test() {
+    try {
+        const res = await pool.query("SELECT NOW()");
+        console.log(res.rows);
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+test();
