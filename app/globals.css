@@ -158,3 +158,224 @@ a {
   line-height: 1.8;
   color: #000000; /* 👈 هذا المهم */
 }
+
+.tshirtPage {
+  min-height: 100vh;
+  background: #ffffff;
+  color: #222;
+  display: grid;
+  grid-template-columns: 58% 42%;
+  gap: 40px;
+  padding: 40px;
+}
+
+.tshirtGallery {
+  display: flex;
+  gap: 25px;
+  align-items: flex-start;
+}
+
+.thumbnailList {
+  width: 90px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.thumbnailList img {
+  width: 80px;
+  height: 100px;
+  object-fit: contain;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 5px;
+}
+
+.mainPreview {
+  position: relative;
+  width: 100%;
+  height: 680px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.shirtImage {
+  position: relative;
+  z-index: 2;
+  max-height: 620px;
+  max-width: 90%;
+  object-fit: contain;
+}
+
+.designOnShirt {
+  position: absolute;
+  z-index: 3;
+  width: 110px;
+  top: 250px;
+  left: 50%;
+  transform: translateX(-50%);
+  object-fit: contain;
+}
+
+.tshirtConfig {
+  padding: 30px;
+}
+
+.tshirtConfig h1 {
+  font-size: 34px;
+  margin-bottom: 12px;
+  color: #222;
+}
+
+.rating {
+  color: #f5a400;
+  font-size: 20px;
+  margin-bottom: 35px;
+}
+
+.rating span {
+  color: #0b66c3;
+  font-size: 16px;
+  margin-left: 10px;
+}
+
+.configBlock {
+  margin-bottom: 28px;
+}
+
+.configBlock h3 {
+  font-size: 17px;
+  margin-bottom: 12px;
+  color: #555;
+}
+
+.techButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.techButtons button {
+  padding: 16px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.techButtons .active {
+  border: 2px solid #111;
+}
+
+.optionBox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #ddd;
+  padding: 18px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-weight: 700;
+  font-size: 17px;
+}
+
+.colorGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  max-width: 520px;
+}
+
+.colorButton {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  border: 1px solid #bbb;
+  cursor: pointer;
+}
+
+.colorButton.selected {
+  outline: 3px solid #111;
+  outline-offset: 3px;
+}
+
+.selectedText {
+  margin-top: 12px;
+  color: #555;
+}
+
+.sizeGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.sizeGrid button {
+  min-width: 58px;
+  padding: 14px 16px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 7px;
+  font-weight: 800;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.selectedSize {
+  border: 2px solid #111 !important;
+}
+
+.uploadBox {
+  display: inline-block;
+  background: #e60012;
+  color: white;
+  padding: 18px 32px;
+  border-radius: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.uploadBox input {
+  display: none;
+}
+
+.priceBox {
+  margin-top: 20px;
+  background: #f7f7f7;
+  border-radius: 12px;
+  padding: 20px;
+  width: 220px;
+}
+
+.priceBox p {
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.priceBox strong {
+  font-size: 28px;
+}
+
+.startDesignButton {
+  margin-top: 25px;
+  width: 100%;
+  padding: 20px;
+  border: none;
+  border-radius: 12px;
+  background: #e60012;
+  color: white;
+  font-size: 20px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.startDesignButton:disabled {
+  background: #f3a1a7;
+  cursor: not-allowed;
+}

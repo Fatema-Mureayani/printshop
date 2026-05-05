@@ -1,3 +1,4 @@
+import Link from "next/link";
 async function getProducts() {
     const res = await fetch("http://127.0.0.1:5098/api/Products", {
         cache: "no-store",
@@ -61,11 +62,15 @@ export default async function Home() {
 
                 <div className="productsGrid">
                     {products.map((product) => (
-                        <div key={product.id} className="productCard">
+                        <Link
+                            key={product.id}
+                            href={product.name === "T-Shirt mit Logo" ? "/t-shirt" : "#"}
+                            className="productCard"
+                        >
                             <h3>{product.name}</h3>
                             <p>{product.description}</p>
                             <strong>{product.price} €</strong>
-                        </div>
+                        </Link>
                     ))}
                 </div>
             </section>
