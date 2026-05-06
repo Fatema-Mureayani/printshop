@@ -1,21 +1,28 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link"; // استيراد Link من Next.js
 
 const colors = [
     { name: "Weiß", file: "white", hex: "#ffffff" },
+    { name: "Baby Blau", file: "baby blue", hex: "#bbd4ee" },
+    { name: "Wild Lime", file: "wild lime", hex: "#c6d659" },
+    { name: "Gelb", file: "yellow", hex: "#facc15" },
+    { name: "Grau", file: "gray", hex: "#a5a7a9" },
+    { name: "Light Grau", file: "light gray", hex: "#6a6967" },
+    { name: "Jade", file: "jade", hex: "#00a6a2" },
+    { name: "Blau", file: "blue", hex: "#2563eb" },
+    { name: "Grün", file: "green", hex: "#007223" },
+    { name: "Khaki", file: "khaki", hex: "#696142" },
     { name: "Rot", file: "red", hex: "#dc2626" },
+    { name: "Orange", file: "orange", hex: "#ff5f2e" },
+    { name: "Pink", file: "pink", hex: "#dd004e" },
+    { name: "Cherry Berry", file: "cherry berry", hex: "#852638" },
     { name: "Navi", file: "navi", hex: "#1a2330" },
     { name: "Schwarz", file: "black", hex: "#111111" },
-    { name: "Grau", file: "gray", hex: "#6b7280" },
-    { name: "Light Grau", file: "light gray", hex: "#6a6967" },
-    { name: "Gelb", file: "yellow", hex: "#facc15" },
-    { name: "Grün", file: "green", hex: "#187532" },
-    { name: "Blau", file: "blue", hex: "#2563eb" },
-    { name: "Orange", file: "orange", hex: "#ff5f2e" },
 ];
 
-const sizes = ["S", "M", "L", "XL", "2XL", "3XL", "4XL"];
+const sizes = ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"];
 
 export default function TShirtPage() {
     const [selectedColor, setSelectedColor] = useState(colors[0]);
@@ -31,6 +38,13 @@ export default function TShirtPage() {
         setDesignPreview(URL.createObjectURL(file));
     }
 
+    // دالة handleDesignStart
+    function handleDesignStart() {
+        console.log("تنفيذ الضغط على الزر");
+        // هنا يمكن إضافة عملية توجيه المستخدم
+        window.location.href = "/t-shirt/design";  // أو يمكنك استخدام Link كما في الأمثلة السابقة
+    }
+
     return (
         <main className="tshirtPage">
             <section className="tshirtGallery">
@@ -44,7 +58,7 @@ export default function TShirtPage() {
                     <img
                         src={selectedShirtImage}
                         alt={`${selectedColor.name} T-Shirt Vorschau`}
-                        className="shirtImage"
+                        className="shirtImage tshirtPageImage" // إضافة class مميز
                     />
 
                     {designPreview && (
@@ -128,7 +142,8 @@ export default function TShirtPage() {
                     <strong>29.99 €</strong>
                 </div>
 
-                <button className="startDesignButton" disabled={!designPreview}>
+                {/* استبدال window.location.href بـ Link من Next.js */}
+                <button className="startDesignButton" onClick={handleDesignStart}>
                     Mit Design beginnen
                 </button>
             </section>

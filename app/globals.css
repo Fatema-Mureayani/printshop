@@ -161,8 +161,8 @@ a {
 
 .tshirtPage {
   min-height: 100vh;
-  background: #ffffff;
-  color: #222;
+  background-color: #111111; /* خلفية سوداء */
+  color: white; /* الكتابة بيضاء */
   display: grid;
   grid-template-columns: 58% 42%;
   gap: 40px;
@@ -194,20 +194,20 @@ a {
 .mainPreview {
   position: relative;
   width: 100%;
-  height: 680px;
+  height: 700px; /* تكبير الصورة */
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #fafafa;
+  background-color: #fafafa;
   border-radius: 16px;
   overflow: hidden;
 }
 
-.shirtImage {
+.tshirtPageImage {
   position: relative;
   z-index: 2;
   max-height: 620px;
-  max-width: 90%;
+  max-width: 100%;
   object-fit: contain;
 }
 
@@ -223,24 +223,13 @@ a {
 
 .tshirtConfig {
   padding: 30px;
+  color: white; /* النص الأبيض */
 }
 
 .tshirtConfig h1 {
   font-size: 34px;
   margin-bottom: 12px;
-  color: #222;
-}
-
-.rating {
-  color: #f5a400;
-  font-size: 20px;
-  margin-bottom: 35px;
-}
-
-.rating span {
-  color: #0b66c3;
-  font-size: 16px;
-  margin-left: 10px;
+  color: #facc15; /* الأصفر للنص */
 }
 
 .configBlock {
@@ -250,39 +239,7 @@ a {
 .configBlock h3 {
   font-size: 17px;
   margin-bottom: 12px;
-  color: #555;
-}
-
-.techButtons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.techButtons button {
-  padding: 16px;
-  border: 1px solid #ccc;
-  background: white;
-  border-radius: 6px;
-  font-weight: 700;
-  font-size: 17px;
-  cursor: pointer;
-}
-
-.techButtons .active {
-  border: 2px solid #111;
-}
-
-.optionBox {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border: 1px solid #ddd;
-  padding: 18px;
-  border-radius: 8px;
-  margin-bottom: 12px;
-  font-weight: 700;
-  font-size: 17px;
+  color: #facc15; /* الأصفر */
 }
 
 .colorGrid {
@@ -301,13 +258,8 @@ a {
 }
 
 .colorButton.selected {
-  outline: 3px solid #111;
+  outline: 3px solid #facc15;
   outline-offset: 3px;
-}
-
-.selectedText {
-  margin-top: 12px;
-  color: #555;
 }
 
 .sizeGrid {
@@ -325,15 +277,17 @@ a {
   font-weight: 800;
   font-size: 16px;
   cursor: pointer;
+  color: black; /* تغيير النص ليصبح باللون الأسود */
 }
 
 .selectedSize {
   border: 2px solid #111 !important;
+  color: black; /* جعل النص في الزر المحدد باللون الأسود */
 }
 
 .uploadBox {
   display: inline-block;
-  background: #e60012;
+  background: #f44336; /* اللون الأحمر */
   color: white;
   padding: 18px 32px;
   border-radius: 14px;
@@ -347,14 +301,14 @@ a {
 
 .priceBox {
   margin-top: 20px;
-  background: #f7f7f7;
+  background: #222222; /* خلفية رمادية */
   border-radius: 12px;
   padding: 20px;
   width: 220px;
 }
 
 .priceBox p {
-  color: #555;
+  color: white;
   margin-bottom: 8px;
 }
 
@@ -368,7 +322,7 @@ a {
   padding: 20px;
   border: none;
   border-radius: 12px;
-  background: #e60012;
+  background: #f44336; /* اللون الأحمر */
   color: white;
   font-size: 20px;
   font-weight: 800;
@@ -378,4 +332,161 @@ a {
 .startDesignButton:disabled {
   background: #f3a1a7;
   cursor: not-allowed;
+}
+
+.designPage {
+  min-height: 100vh;
+  padding: 24px;
+  background-color: black;
+  color: white;
+}
+
+h1 {
+  font-size: 32px;
+  margin-bottom: 24px;
+  color: #facc15;
+}
+
+/* تقسيم الصفحة يمين ويسار */
+.designLayout {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+/* القسم اليسار */
+.controlPanel {
+  width: 42%;
+  max-width: 620px;
+}
+
+/* القسم اليمين */
+.previewPanel {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 20px;
+}
+
+.textInput,
+.fontSelection,
+.positionSelection,
+.rotationSelection,
+.bendSelection,
+.colorSelection {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 6px;
+}
+
+textarea {
+  width: 100%;
+  height: 70px;   /* هون صغرنا مكان كتابة النص */
+  padding: 10px;
+  font-size: 18px;
+  resize: vertical;
+}
+
+select {
+  width: 100%;
+  padding: 10px;
+  font-size: 18px;
+}
+
+.tshirtPreview {
+  display: flex;
+  justify-content: center;
+}
+
+.cartButton {
+  background-color: #f44336;
+  color: white;
+  padding: 12px 22px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.cartButton:hover {
+  background-color: #eab308;
+}
+
+/* أزرار الألوان */
+.colorGrid {
+  display: flex;
+  gap: 18px;
+  margin-top: 8px;
+}
+
+.colorButton {
+  width: 58px;
+  height: 50px;
+  border-radius: 8px;
+  border: 2px solid #aaa;
+  cursor: pointer;
+}
+
+/* السلايدر */
+.customSlider {
+  width: 260px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.customSlider::-webkit-slider-runnable-track {
+  height: 4px;
+  background: #333;
+  border-radius: 999px;
+}
+
+.customSlider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  background: #facc15;
+  border-radius: 50%;
+  border: 2px solid white;
+  margin-top: -9px;
+}
+
+.customSlider::-moz-range-track {
+  height: 4px;
+  background: #333;
+  border-radius: 999px;
+}
+
+.customSlider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  background: #facc15;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+/* للموبايل */
+@media (max-width: 900px) {
+  .designLayout {
+    flex-direction: column;
+  }
+
+  .controlPanel {
+    width: 100%;
+    max-width: none;
+  }
+
+  .previewPanel {
+    width: 100%;
+  }
 }
