@@ -28,6 +28,8 @@ export default function TShirtPage() {
     const [selectedColor, setSelectedColor] = useState(colors[0]);
     const [selectedSize, setSelectedSize] = useState("S");
     const [designPreview, setDesignPreview] = useState<string | null>(null);
+    const [textInput, setTextInput] = useState("");
+    const [description, setDescription] = useState("");
 
     const selectedShirtImage = `/tshirts/${selectedColor.file}.png`;
 
@@ -40,9 +42,20 @@ export default function TShirtPage() {
 
     // دالة handleDesignStart
     function handleDesignStart() {
-        console.log("تنفيذ الضغط على الزر");
-        // هنا يمكن إضافة عملية توجيه المستخدم
-        window.location.href = "/t-shirt/design";  // أو يمكنك استخدام Link كما في الأمثلة السابقة
+        const tshirtConfig = {
+            productId: 1,
+            productName: "Klassisches Unisex T-Shirt",
+            color: selectedColor.name,
+            colorFile: selectedColor.file,
+            size: selectedSize,
+            text: textInput,
+            description: description,
+            price: 29.99
+        };
+
+        localStorage.setItem("tshirtConfig", JSON.stringify(tshirtConfig));
+
+        window.location.href = "/t-shirt/design";
     }
 
     return (
@@ -61,7 +74,7 @@ export default function TShirtPage() {
                         className="shirtImage tshirtPageImage" // إضافة class مميز
                     />
 
-                    {designPreview && (
+                    {designPreview && ( // إذا يوجد تصميم مرفوع، أظهره فوق القميص
                         <img
                             src={designPreview}
                             alt="Design Vorschau"
@@ -129,12 +142,44 @@ export default function TShirtPage() {
                 </div>
 
                 <div className="configBlock">
-                    <h3>Design hochladen</h3>
+                    <h3>Eigene Designs hochladen</h3>
 
                     <label className="uploadBox">
                         Design hochladen
                         <input type="file" accept="image/*" onChange={handleUpload} />
                     </label>
+                </div>
+
+                {/* : Text eingeben */}
+                <div className="configBlock">
+                    <h3> Der Print-Shop erstellt Ihre Designs.</h3>
+                    <label className="textInputLabel">
+                        Text eingeben
+                        <input
+                            type="text"
+                            className="textInputField"
+                            value={textInput}
+                            onChange={(e) => setTextInput(e.target.value)}
+                            placeholder="z.B. Mein tolles T-Shirt"
+                        />
+                    </label>
+                    <p className="inputHint">Geben Sie die Designbeschreibung ein, die auf dem T-Shirt gedruckt werden soll.</p>
+                </div>
+
+                {/*  Beschreibung / Notizen */}
+                <div className="configBlock">
+                    <h3> Beschreibung / Notizen</h3>
+                    <label className="descriptionLabel">
+                        Zusätzliche Informationen
+                        <textarea
+                            className="descriptionInput"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder="z.B. Besondere Wünsche, Farben, Platzierung, etc."
+                            rows={4}
+                        />
+                    </label>
+                    <p className="inputHint">Fügen Sie hier spezielle Anweisungen für den Print-Shop hinzu.</p>
                 </div>
 
                 <div className="priceBox">

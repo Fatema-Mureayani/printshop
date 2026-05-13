@@ -333,7 +333,75 @@ a {
   background: #f3a1a7;
   cursor: not-allowed;
 }
+/* ملاحظة الخدمة */
+.serviceNote {
+  background-color: #f0f9ff;
+  border-left: 4px solid #3b82f6;
+  padding: 12px 16px;
+  margin: 20px 0;
+  border-radius: 8px;
+}
 
+.serviceText {
+  color: #1e40af;
+  font-weight: 500;
+  margin: 0;
+  font-size: 14px;
+}
+
+/* حقول إدخال النص */
+.textInputLabel,
+.descriptionLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.textInputField {
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.2s;
+}
+
+.textInputField:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.descriptionInput {
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.descriptionInput:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.inputHint {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+.uploadSuccess {
+  color: #10b981;
+  font-size: 14px;
+  margin-top: 8px;
+  font-weight: 500;
+}
 .designPage {
   min-height: 100vh;
   padding: 24px;
@@ -341,6 +409,40 @@ a {
   color: white;
 }
 
+/* الشريط العلوي: العنوان يسار، زر السلة يمين */
+.designTopBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.designTopBar h1 {
+  font-size: 32px;
+  margin: 0;
+  color: #facc15;
+}
+
+/* زر Zum Warenkorb فوق يمين */
+.topCartButton {
+  background-color: #f44336;
+  color: white;
+  padding: 12px 22px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.topCartButton:hover {
+  background-color: #d32f2f;
+}
+
+/* العنوان القديم لو موجود خارج topbar */
 h1 {
   font-size: 32px;
   margin-bottom: 24px;
@@ -371,6 +473,7 @@ h1 {
 
 .textInput,
 .fontSelection,
+.fontSizeSelection,
 .positionSelection,
 .rotationSelection,
 .bendSelection,
@@ -387,7 +490,7 @@ label {
 
 textarea {
   width: 100%;
-  height: 70px;   /* هون صغرنا مكان كتابة النص */
+  height: 70px;
   padding: 10px;
   font-size: 18px;
   resize: vertical;
@@ -404,6 +507,12 @@ select {
   justify-content: center;
 }
 
+.tshirtPreview canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* زر الإضافة للسلة */
 .cartButton {
   background-color: #f44336;
   color: white;
@@ -417,22 +526,7 @@ select {
 }
 
 .cartButton:hover {
-  background-color: #eab308;
-}
-
-/* أزرار الألوان */
-.colorGrid {
-  display: flex;
-  gap: 18px;
-  margin-top: 8px;
-}
-
-.colorButton {
-  width: 58px;
-  height: 50px;
-  border-radius: 8px;
-  border: 2px solid #aaa;
-  cursor: pointer;
+  background-color: #d32f2f;
 }
 
 /* السلايدر */
@@ -475,8 +569,73 @@ select {
   border: 2px solid white;
 }
 
+/* Color Picker Icon */
+.colorSelection {
+  margin-bottom: 20px;
+}
+
+.colorPickerIcon {
+  width: 58px;
+  height: 58px;
+  border-radius: 10px;
+  border: 2px solid white;
+  cursor: pointer;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background:
+          linear-gradient(
+                  135deg,
+                  #ff0000 0%,
+                  #ff9900 18%,
+                  #ffff00 35%,
+                  #00ff00 50%,
+                  #00ffff 65%,
+                  #0000ff 80%,
+                  #ff00ff 100%
+          );
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.25);
+  margin-top: 8px;
+  overflow: hidden;
+  transition: transform 0.15s ease;
+}
+
+.colorPickerIcon:hover {
+  transform: scale(1.05);
+}
+
+.pickerSymbol {
+  color: white;
+  font-size: 28px;
+  font-weight: bold;
+  text-shadow: 0 2px 4px black;
+  pointer-events: none;
+}
+
+.hiddenColorInput {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.selectedColorText {
+  margin-left: 12px;
+  font-size: 15px;
+  font-weight: bold;
+  color: white;
+}
+
 /* للموبايل */
 @media (max-width: 900px) {
+  .designTopBar {
+    align-items: flex-start;
+    gap: 16px;
+  }
+
   .designLayout {
     flex-direction: column;
   }
@@ -488,5 +647,285 @@ select {
 
   .previewPanel {
     width: 100%;
+  }
+
+  .customSlider {
+    width: 100%;
+    max-width: 260px;
+  }
+}
+/*  Warenkorb Seite */
+.cartPage {
+  min-height: 100vh;
+  padding: 40px;
+  background-color: black;
+  color: white;
+}
+
+/* عنوان Warenkorb */
+.cartPage h1 {
+  color: #facc15;
+  font-size: 42px;
+  margin-bottom: 36px;
+}
+
+/* قائمة المنتجات */
+.cartList {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* كرت المنتج */
+.cartItem {
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  padding: 36px;
+  border: 1px solid #333;
+  border-radius: 20px;
+  background: #111111;
+  color: white;
+}
+
+/* صورة المنتج */
+.cartPreviewImage {
+  width: 300px;
+  height: 300px;
+  object-fit: contain;
+  border: 1px solid #333;
+  border-radius: 16px;
+  background: white;
+}
+
+/* معلومات المنتج */
+.cartItemInfo {
+  flex: 1;
+  color: white;
+}
+
+.cartItemInfo h3 {
+  color: #facc15;
+  font-size: 30px;
+  margin-bottom: 16px;
+}
+
+.cartItemInfo p,
+.cartItemInfo strong {
+  color: white;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+/* زر الحذف */
+.removeCartButton {
+  margin-top: 22px;
+  padding: 16px 44px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  background: #f44336;
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.removeCartButton:hover {
+  background: #d32f2f;
+}
+
+/* قسم السعر النهائي */
+.cartSummary {
+  margin-top: 40px;
+  padding: 32px;
+  border-radius: 20px;
+  background: #111111;
+  color: white;
+  border: 1px solid #333;
+}
+
+.cartSummary h2 {
+  color: #facc15;
+  font-size: 34px;
+  margin-bottom: 24px;
+}
+
+/* زر تفريغ السلة */
+.clearCartButton {
+  padding: 16px 34px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  background: #f44336;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.clearCartButton:hover {
+  background: #d32f2f;
+}
+
+.customerForm {
+  margin-top: 40px;
+  padding: 48px 56px;
+  border-radius: 24px;
+  background: #111111;
+  border: 1px solid #333;
+  color: white;
+}
+
+.customerForm h2 {
+  color: #facc15;
+  font-size: 46px;
+  font-weight: 800;
+  margin-bottom: 36px;
+}
+
+.customerInputGroup {
+  margin-bottom: 28px;
+  max-width: 760px;
+}
+
+.customerInputGroup label {
+  display: block;
+  color: white;
+  font-size: 26px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.customerInputGroup input {
+  width: 100%;
+  height: 56px;
+  padding: 0 18px;
+  border-radius: 10px;
+  border: 2px solid #444;
+  background: white;
+  color: black;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.customerInputGroup input::placeholder {
+  color: #777;
+}
+
+.customerInputGroup input:focus {
+  outline: none;
+  border-color: #facc15;
+  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.25);
+}
+
+/* إذا السلة فارغة */
+.cartPage .infoBox {
+  background: #111111;
+  color: white;
+  border: 1px solid #333;
+  border-radius: 20px;
+  padding: 28px;
+}
+
+.cartPage .infoBox p {
+  color: white;
+  font-size: 20px;
+}
+/* للعداد */
+.quantityBox {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 14px;
+  margin-bottom: 10px;
+}
+
+.quantityLabel {
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+}
+
+.quantityControl {
+  display: flex;
+  align-items: center;
+  width: 90px;
+  height: 52px;
+  border: 2px solid #333;
+  background: white;
+  color: black;
+}
+
+.quantityNumber {
+  flex: 1;
+  text-align: center;
+  font-size: 22px;
+  color: black;
+}
+
+.quantityButtons {
+  width: 32px;
+  height: 100%;
+  border-left: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+}
+
+.quantityButtons button {
+  flex: 1;
+  border: none;
+  background: #eeeeee;
+  color: #555555;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0;
+}
+
+.quantityButtons button:hover {
+  background: #dddddd;
+  color: black;
+}
+
+.cartSummaryButtons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.submitOrderButton {
+  padding: 16px 34px;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  background: #facc15;
+  color: black;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.submitOrderButton:hover {
+  background: #eab308;
+}
+
+/* موبايل */
+@media (max-width: 900px) {
+  .cartItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cartPreviewImage {
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+  }
+
+  .cartItemInfo h3 {
+    font-size: 24px;
+  }
+
+  .cartItemInfo p,
+  .cartItemInfo strong {
+    font-size: 18px;
   }
 }

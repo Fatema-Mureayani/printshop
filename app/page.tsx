@@ -34,8 +34,10 @@ export default async function Home() {
                 </div>
 
                 <div className="headerActions">
-                    <a href="#warenkorb" className="headerItem">🛒 Warenkorb</a>
-                    <a href="#kontakt" className="headerItem">📞 Kontakt</a>
+                    <Link href="/warenkorb" className="headerItem">
+                         Warenkorb
+                    </Link>
+                    <a href="#kontakt" className="headerItem"> Kontakt</a>
                 </div>
             </header>
 
@@ -97,12 +99,6 @@ export default async function Home() {
                 </div>
             </section>
 
-            <section id="warenkorb" className="section">
-                <h2 className="sectionTitle">Warenkorb</h2>
-                <div className="infoBox">
-                    <p>Ihr Warenkorb ist momentan leer.</p>
-                </div>
-            </section>
         </main>
     );
 }

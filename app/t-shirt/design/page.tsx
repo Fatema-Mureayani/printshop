@@ -1,7 +1,46 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
 
-function drawArcText(ctx, text, centerX, baseY, radius, isTop = true) {
+import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
+
+type ShirtConfig = {
+    productId: number;
+    productName: string;
+    color: string;
+    colorFile: string;
+    size: string;
+    text: string;
+    description: string;
+    price: number;
+};
+
+type CartItem = {
+    id: number;
+    productId: number;
+    productName: string;
+    color: string;
+    colorFile: string;
+    size: string;
+    customText: string;
+    description: string;
+    font: string;
+    fontSize: number;
+    textColor: string;
+    position: string;
+    rotate: number;
+    bend: number;
+    price: number;
+    previewImage: string;
+};
+
+function drawArcText(
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    centerX: number,
+    baseY: number,
+    radius: number,
+    isTop = true
+) {
     const chars = [...text];
     const spacing = 2;
 
@@ -32,7 +71,7 @@ function drawArcText(ctx, text, centerX, baseY, radius, isTop = true) {
     });
 }
 
-function getTextPosition(canvas, position) {
+function getTextPosition(canvas: HTMLCanvasElement, position: string) {
     switch (position) {
         case "top-left":
             return { x: 120, y: 120 };
@@ -48,14 +87,34 @@ function getTextPosition(canvas, position) {
 }
 
 export default function DesignPage() {
-    const [designText, setDesignText] = useState(""); // النص المدخل
+    const [designText, setDesignText] = useState("");
     const [font, setFont] = useState("sans-serif");
     const [position, setPosition] = useState("center");
     const [rotate, setRotate] = useState(0);
-    const [textColor, setTextColor] = useState("#facc15"); // اللون الافتراضي للنص
-    const canvasRef = useRef(null); // لإشارة إلى الـ canvas
-    const [bend, setBend] = useState(0); // انحناء النص
+    const [textColor, setTextColor] = useState("#facc15");
+    const [bend, setBend] = useState(0);
+    const [fontSize, setFontSize] = useState(28);
 
+    const [shirtConfig, setShirtConfig] = useState<ShirtConfig | null>(null);
+
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+    // هنا نقرأ بيانات التيشيرت المختار من صفحة /t-shirt
+    useEffect(() => {
+        const savedConfig = localStorage.getItem("tshirtConfig");
+
+        if (savedConfig) {
+            const parsedConfig: ShirtConfig = JSON.parse(savedConfig);
+
+            setShirtConfig(parsedConfig);
+
+            if (parsedConfig.text) {
+                setDesignText(parsedConfig.text);
+            }
+        }
+    }, []);
+
+    // هنا نرسم التيشيرت والنص على canvas
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -64,7 +123,10 @@ export default function DesignPage() {
         if (!ctx) return;
 
         const shirtImage = new Image();
-        shirtImage.src = "/tshirts/white.png";
+
+        shirtImage.src = shirtConfig?.colorFile
+            ? `/tshirts/${shirtConfig.colorFile}.png`
+            : "/tshirts/white.png";
 
         shirtImage.onload = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -72,7 +134,7 @@ export default function DesignPage() {
 
             if (!designText.trim()) return;
 
-            ctx.font = `bold 28px ${font}`;
+            ctx.font = `bold ${fontSize}px ${font}`;
             ctx.fillStyle = textColor;
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
@@ -88,7 +150,6 @@ export default function DesignPage() {
             } else {
                 const isTop = bend > 0;
                 const absBend = Math.abs(bend);
-
                 const radius = Math.max(80, 280 - absBend);
 
                 drawArcText(ctx, designText, 0, 0, radius, isTop);
@@ -96,23 +157,67 @@ export default function DesignPage() {
 
             ctx.restore();
         };
-    }, [designText, font, position, rotate, textColor, bend]);
-    // دالة لاختيار اللون
-    const colorOptions = [
-        "#facc15", "#000000", "#ffffff", "#dc2626",
-        "#2563eb", "#187532", "#c6d659", "#00a6a2",
-        "#bbd4ee", "#852638", "#dd004e", "#696142",
-        "#ff5f2e", "#6a6967"
-    ];
+    }, [
+        designText, font, position, rotate, textColor, bend, fontSize, shirtConfig]);
+
+    function handleAddToCart() {
+        const canvas = canvasRef.current;
+
+        if (!canvas) {
+            alert("Canvas wurde nicht gefunden");
+            return;
+        }
+
+        if (!shirtConfig) {
+            alert("T-Shirt Daten wurden nicht gefunden");
+            return;
+        }
+
+        const previewImage = canvas.toDataURL("image/png");
+
+        const cartItem: CartItem = {
+            id: Date.now(),
+            productId: shirtConfig.productId,
+            productName: shirtConfig.productName,
+            color: shirtConfig.color,
+            colorFile: shirtConfig.colorFile,
+            size: shirtConfig.size,
+            customText: designText,
+            description: shirtConfig.description,
+            font: font,
+            fontSize: fontSize,
+            textColor: textColor,
+            position: position,
+            rotate: rotate,
+            bend: bend,
+            price: shirtConfig.price,
+            previewImage: previewImage,
+            quantity: 1
+        };
+
+        const existingCart = localStorage.getItem("cart");
+        const cart: CartItem[] = existingCart ? JSON.parse(existingCart) : [];
+
+        cart.push(cartItem);
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+
+        alert("Produkt wurde zum Warenkorb hinzugefügt");
+    }
 
     return (
         <div className="designPage">
-            <h1>Design dein T-Shirt</h1>
+            <div className="designTopBar">
+                <h1>Design dein T-Shirt</h1>
+
+                <Link href="/warenkorb" className="topCartButton">
+                    Zum Warenkorb
+                </Link>
+            </div>
+
 
             <div className="designLayout">
-                {/* القسم اليسار */}
                 <div className="controlPanel">
-
                     <div className="textInput">
                         <label>Text</label>
                         <textarea
@@ -124,16 +229,34 @@ export default function DesignPage() {
 
                     <div className="fontSelection">
                         <label>Schriftart</label>
-                        <select onChange={(e) => setFont(e.target.value)} value={font}>
+                        <select
+                            onChange={(e) => setFont(e.target.value)}
+                            value={font}
+                        >
                             <option value="sans-serif">Sans Serif</option>
                             <option value="serif">Serif</option>
                             <option value="monospace">Monospace</option>
                         </select>
                     </div>
 
+                    <div className="fontSizeSelection">
+                        <label>Schriftgröße: {fontSize}px</label>
+                        <input
+                            className="customSlider"
+                            type="range"
+                            min="12"
+                            max="80"
+                            value={fontSize}
+                            onChange={(e) => setFontSize(Number(e.target.value))}
+                        />
+                    </div>
+
                     <div className="positionSelection">
                         <label>Position</label>
-                        <select onChange={(e) => setPosition(e.target.value)} value={position}>
+                        <select
+                            onChange={(e) => setPosition(e.target.value)}
+                            value={position}
+                        >
                             <option value="center">Zentrum</option>
                             <option value="top-left">Oben links</option>
                             <option value="top-right">Oben rechts</option>
@@ -143,7 +266,7 @@ export default function DesignPage() {
                     </div>
 
                     <div className="rotationSelection">
-                        <label>Drehung</label>
+                        <label>Drehung: {rotate}°</label>
                         <input
                             className="customSlider"
                             type="range"
@@ -155,7 +278,7 @@ export default function DesignPage() {
                     </div>
 
                     <div className="bendSelection">
-                        <label>Biegen</label>
+                        <label>Biegen: {bend}</label>
                         <input
                             className="customSlider"
                             type="range"
@@ -168,32 +291,36 @@ export default function DesignPage() {
 
                     <div className="colorSelection">
                         <label>Text Farbe</label>
-                        <div className="colorGrid">
-                            {colorOptions.map((color, index) => (
-                                <button
-                                    key={index}
-                                    type="button"
-                                    style={{ backgroundColor: color }}
-                                    className="colorButton"
-                                    onClick={() => setTextColor(color)}
-                                />
-                            ))}
-                        </div>
+
+                        <label className="colorPickerIcon">
+                            <span className="pickerSymbol">🖌</span>
+
+                            <input
+                                type="color"
+                                value={textColor}
+                                onChange={(e) => setTextColor(e.target.value)}
+                                className="hiddenColorInput"
+                            />
+                        </label>
+
+                        <span className="selectedColorText">{textColor}</span>
                     </div>
 
-                    <button className="cartButton">
+                    <button className="cartButton" onClick={handleAddToCart}>
                         Zum Warenkorb hinzufügen
                     </button>
                 </div>
 
-                {/* القسم اليمين */}
                 <div className="previewPanel">
                     <div className="tshirtPreview">
                         <canvas
                             ref={canvasRef}
                             width={500}
                             height={500}
-                            style={{ border: "1px solid #ddd", backgroundColor: "#fff" }}
+                            style={{
+                                border: "1px solid #ddd",
+                                backgroundColor: "#fff"
+                            }}
                         />
                     </div>
                 </div>
