@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type ShirtConfig = {
     productId: number;
@@ -87,6 +88,7 @@ function getTextPosition(canvas: HTMLCanvasElement, position: string) {
 }
 
 export default function DesignPage() {
+    const router = useRouter();
     const [designText, setDesignText] = useState("");
     const [font, setFont] = useState("sans-serif");
     const [position, setPosition] = useState("center");
@@ -203,6 +205,8 @@ export default function DesignPage() {
         localStorage.setItem("cart", JSON.stringify(cart));
 
         alert("Produkt wurde zum Warenkorb hinzugefügt");
+
+        router.push("/");
     }
 
     return (

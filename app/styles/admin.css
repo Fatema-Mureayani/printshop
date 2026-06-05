@@ -1,0 +1,239 @@
+/* Admin Page */
+.adminOrdersPage {
+  min-height: 100vh;
+  padding: 40px;
+  background: #000;
+  color: #fff;
+}
+
+.adminOrdersPage h1 {
+  color: #facc15;
+  font-size: 52px;
+  margin-bottom: 36px;
+}
+
+.adminOrdersList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.adminOrderCard {
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.adminOrderSummary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 28px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.adminOrderSummary:hover {
+  background: #181818;
+}
+
+.adminOrderMainInfo h2 {
+  color: #facc15;
+  font-size: 28px;
+  margin: 0 0 8px;
+}
+
+.adminOrderMainInfo p {
+  color: #ddd;
+  font-size: 18px;
+  margin: 0;
+}
+
+.adminOrderRightSide {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.orderStatus {
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.statusPending {
+  background: #facc15;
+  color: #000;
+}
+
+.statusConfirmed {
+  background: #22c55e;
+  color: #fff;
+}
+
+.statusRejected {
+  background: #ef4444;
+  color: #fff;
+}
+
+.accordionIcon {
+  color: white;
+  font-size: 18px;
+}
+
+.adminOrderDetails {
+  padding: 28px;
+  border-top: 1px solid #333;
+  background: #0b0b0b;
+}
+
+.adminOrderGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.adminDetailBox {
+  background: #151515;
+  border: 1px solid #333;
+  border-radius: 16px;
+  padding: 22px;
+}
+
+.adminDetailBox h3 {
+  color: #facc15;
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+
+.adminDetailBox p {
+  color: #fff;
+  font-size: 17px;
+  margin-bottom: 10px;
+}
+
+.adminDetailBox strong {
+  color: #fff;
+}
+
+.adminOrderFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  margin-top: 26px;
+}
+
+.adminOrderFooter p {
+  color: #ccc;
+  font-size: 16px;
+}
+
+.adminActionButtons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.adminActionButtons button {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.confirmButton {
+  background: #22c55e;
+  color: white;
+}
+
+.confirmButton:hover {
+  background: #16a34a;
+}
+
+.rejectButton {
+  background: #ef4444;
+  color: white;
+}
+
+.rejectButton:hover {
+  background: #dc2626;
+}
+
+.deleteButton {
+  background: #facc15;
+  color: black;
+}
+
+.deleteButton:hover {
+  background: #eab308;
+}
+
+.adminLoadingText,
+.adminEmptyText {
+  color: white;
+  font-size: 22px;
+}
+
+@media (max-width: 900px) {
+  .adminOrderSummary,
+  .adminOrderFooter {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .adminOrderGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.adminProductsSection {
+  margin-top: 28px;
+}
+
+.adminProductsSection h3 {
+  color: #facc15;
+  font-size: 28px;
+  margin-bottom: 18px;
+}
+
+.adminProductsList {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.adminProductItem {
+  background: #151515;
+  border: 1px solid #333;
+  border-radius: 16px;
+  padding: 22px;
+}
+
+.adminProductItem h4 {
+  color: #facc15;
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.adminProductGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px 20px;
+}
+
+.adminProductGrid p {
+  color: white;
+  font-size: 16px;
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .adminProductGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type CartItem = {
     id: number;
@@ -23,10 +24,13 @@ type CartItem = {
 };
 
 export default function WarenkorbPage() {
+    const router = useRouter();
     const [cart, setCart] = useState<CartItem[]>([]);
     const [customerName, setCustomerName] = useState("");
     const [customerEmail, setCustomerEmail] = useState("");
     const [customerPhone, setCustomerPhone] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false); // حماية من الضغط مرتين. لازم نضيف isSubmitting
 
     useEffect(() => {
         const savedCart = localStorage.getItem("cart");
@@ -76,12 +80,18 @@ export default function WarenkorbPage() {
         localStorage.removeItem("cart");
     }
 
+    function leaveCart() {
+        router.push("/");
+    }
+
     const totalPrice = cart.reduce(
         (sum, item) => sum + item.price * (item.quantity ?? 1),
         0
     );
 
     async function submitOrder() {
+        if (isSubmitting) return;
+
         if (cart.length === 0) {
             alert("Der Warenkorb ist leer");
             return;
@@ -102,9 +112,15 @@ export default function WarenkorbPage() {
             return;
         }
 
+        setIsSubmitting(true);
+
         try {
-            for (const item of cart) {
-                const orderData = {
+            const orderData = {
+                customerName: customerName,
+                customerEmail: customerEmail,
+                customerPhone: customerPhone,
+
+                items: cart.map((item) => ({
                     productId: item.productId,
                     productName: item.productName,
                     color: item.color,
@@ -117,27 +133,21 @@ export default function WarenkorbPage() {
                     position: item.position,
                     rotate: item.rotate,
                     bend: item.bend,
-                    price: item.price * (item.quantity ?? 1),
+                    price: item.price,
                     quantity: item.quantity ?? 1,
+                })),
+            };
 
-                    customerName: customerName,
-                    customerEmail: customerEmail,
-                    customerPhone: customerPhone,
+            const res = await fetch("http://localhost:5098/api/Orders/group", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(orderData),
+            });
 
-                    status: "Pending",
-                };
-
-                const res = await fetch("http://localhost:5098/api/Orders", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(orderData),
-                });
-
-                if (!res.ok) {
-                    throw new Error("Fehler beim Senden der Bestellung");
-                }
+            if (!res.ok) {
+                throw new Error("Fehler beim Senden der Bestellung");
             }
 
             localStorage.removeItem("cart");
@@ -147,16 +157,35 @@ export default function WarenkorbPage() {
             setCustomerEmail("");
             setCustomerPhone("");
 
-            alert("Bestellung wurde erfolgreich abgeschickt");
+            setSuccessMessage(
+                "Ihre Bestellung wurde erfolgreich abgeschickt. Sie werden in 5 Sekunden zur Startseite weitergeleitet."
+            );
+
+            setTimeout(() => {
+                router.push("/");
+            }, 5000);
         } catch (error) {
             console.error(error);
             alert("Fehler beim Abschicken der Bestellung");
+            setIsSubmitting(false);
         }
     }
 
     return (
         <main className="cartPage">
-            <h1>Warenkorb</h1>
+            <div className="cartHeader">
+                <h1>Warenkorb</h1>
+
+                <button className="leaveCartButton" onClick={leaveCart}>
+                    Warenkorb verlassen
+                </button>
+            </div>
+
+            {successMessage && (
+                <div className="successMessage">
+                    {successMessage}
+                </div>
+            )}
 
             {cart.length === 0 ? (
                 <div className="infoBox">
@@ -270,11 +299,21 @@ export default function WarenkorbPage() {
                         <h2>Gesamtpreis: {totalPrice.toFixed(2)} €</h2>
 
                         <div className="cartSummaryButtons">
-                            <button className="submitOrderButton" onClick={submitOrder}>
-                                Bestellung abschicken
+                            <button
+                                type="button"
+                                className="submitOrderButton"
+                                onClick={submitOrder}
+                                disabled={isSubmitting} //يمنع أن الطلب ينرسل مرتين إذا ضغط المستخدم مرتين بسرعة
+                            >
+                                {isSubmitting ? "Bestellung wird gesendet..." : "Bestellung abschicken"}
                             </button>
 
-                            <button className="clearCartButton" onClick={clearCart}>
+                            <button
+                                type="button"
+                                className="clearCartButton"
+                                onClick={clearCart}
+                                disabled={isSubmitting}
+                            >
                                 Warenkorb leeren
                             </button>
                         </div>
