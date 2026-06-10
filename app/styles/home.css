@@ -1,139 +1,679 @@
+
+/* HEADER */
+
 .topHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 50px;
-  background-color: #000;
-  border-bottom: 1px solid #d4af37;
+  padding: 22px 60px;
+  background: #050505;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.35);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .logoArea {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 14px;
 }
 
 .logoImg {
-  height: 65px;
+  height: 58px;
   width: auto;
 }
 
 .logoText h1 {
-  font-size: 26px;
+  font-size: 24px;
   color: #d4af37;
+  margin: 0;
 }
 
 .logoText p {
   font-size: 14px;
   color: #aaa;
-}
-
-.companyName {
-  font-size: 28px;
-  color: #d4af37; /* ذهبي */
-}
-
-.companySubtext {
-  color: #6b7280;
-  margin-top: 4px;
+  margin: 0;
 }
 
 .headerActions {
   display: flex;
-  gap: 30px;
+  align-items: center;
+  gap: 26px;
 }
 
 .headerItem {
-  font-size: 18px;
   color: #fff;
-  font-weight: 500;
-  transition: 0.3s;
+  font-size: 16px;
+  font-weight: 700;
+  transition: 0.25s;
 }
 
 .headerItem:hover {
   color: #d4af37;
 }
 
+/* زر Warenkorb المهم، الرابط يبقى كما هو في page.tsx */
+.cartHeaderButton {
+  color: #000;
+  background: #d4af37;
+  padding: 11px 18px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 900;
+  transition: 0.25s;
+}
+
+.cartHeaderButton:hover {
+  background: #f5cc4b;
+  transform: translateY(-2px);
+}
+
+/* إذا بقي عندك mainNav قديم، نخفيه لأن الهيدر الجديد فيه الروابط */
 .mainNav {
-  display: flex;
-  gap: 32px;
-  background-color: #000000;
-  color: #ffffff;
-  padding: 16px 40px;
-  border-bottom: 1px solid #d4af37;
+  display: none;
 }
 
-.navLink {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.navLink:hover {
-  color: #d4af37;
-}
+/* ================= HERO SECTION ================= */
 
 .heroSection {
-  background: #000000; /* أسود */
-  padding: 60px 40px;
-  border-bottom: 1px solid #d4af37;
+  min-height: 620px;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  align-items: center;
+  gap: 55px;
+  padding: 85px 60px;
+  background:
+          radial-gradient(circle at 80% 25%, rgba(212, 175, 55, 0.18), transparent 34%),
+          radial-gradient(circle at 15% 85%, rgba(212, 175, 55, 0.07), transparent 28%),
+          linear-gradient(135deg, #030303, #111111);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+.sectionLabel {
+  display: block;
+  margin-bottom: 12px;
+  color: #d4af37;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
 }
 
 .heroText h2 {
-  font-size: 36px;
-  margin-bottom: 12px;
-  color: #d4af37; /* ذهبي */
+  font-size: 64px;
+  line-height: 1.05;
+  margin-bottom: 24px;
+  color: #fff;
+}
+
+.heroText h2 span {
+  color: #d4af37;
 }
 
 .heroText p {
+  max-width: 560px;
   font-size: 18px;
-  color: #ffffff; /* أبيض */
+  line-height: 1.7;
+  color: #d8d8d8;
 }
 
+.heroButton {
+  display: inline-block;
+  margin-top: 30px;
+  padding: 15px 28px;
+  background: #d4af37;
+  color: #000;
+  border-radius: 10px;
+  font-weight: 900;
+  transition: 0.25s;
+}
+
+.heroButton:hover {
+  transform: translateY(-3px);
+  background: #f5cc4b;
+}
+
+/* الميزات تحت الزر */
+.heroFeatures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin-top: 34px;
+}
+
+.heroFeatures div {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #e5e5e5;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.heroFeatures span {
+  color: #d4af37;
+  font-size: 18px;
+}
+
+/* صورة الـ Hero */
+.heroImageBox {
+  background: linear-gradient(145deg, #1a1a1a, #050505);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 30px;
+  padding: 22px;
+  box-shadow: 0 35px 90px rgba(0, 0, 0, 0.75);
+}
+
+.heroImageBox img {
+  width: 100%;
+  display: block;
+  border-radius: 24px;
+  transform: rotate(-3deg);
+  transition: 0.35s;
+}
+
+.heroImageBox:hover img {
+  transform: rotate(0deg) scale(1.02);
+}
+
+/* ================= GENERAL SECTIONS ================= */
+
 .section {
-  padding: 40px;
+  padding: 70px 60px;
+  background: #0f0f0f;
+}
+
+.section:nth-of-type(even) {
+  background: #111111;
+}
+
+.sectionHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 30px;
 }
 
 .sectionTitle {
-  font-size: 30px;
-  margin-bottom: 24px;
-  color: #d4af37;
+  font-size: 38px;
+  margin: 0 0 28px;
+  color: #fff;
+  line-height: 1.2;
 }
+
+.sectionHeaderRow .sectionTitle {
+  margin-bottom: 0;
+}
+
+.outlineButton {
+  border: 1px solid #d4af37;
+  color: #d4af37;
+  padding: 10px 16px;
+  border-radius: 9px;
+  font-weight: 800;
+  font-size: 14px;
+  transition: 0.25s;
+}
+
+.outlineButton:hover {
+  background: #d4af37;
+  color: #000;
+}
+
+/* ================= SHOWCASE / UNSERE ARBEITEN ================= */
+
+.showcaseGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 18px;
+}
+
+.showcaseCard {
+  height: 255px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #191919;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+}
+
+.showcaseCard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.78), transparent 55%);
+}
+
+.showcaseCard img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.86;
+  transition: 0.35s;
+}
+
+.showcaseCard:hover img {
+  transform: scale(1.08);
+  opacity: 1;
+}
+
+.showcaseCard span {
+  position: absolute;
+  left: 18px;
+  bottom: 18px;
+  z-index: 2;
+  color: white;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+/* ================= PRODUCTS FROM BACKEND ================= */
 
 .productsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
+  gap: 26px;
 }
 
 .productCard {
-  background-color: #111111;
-  border: 1px solid #d4af37;
-  border-radius: 14px;
-  padding: 20px;
+  overflow: hidden;
+  background: #151515;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 18px;
+  transition: 0.25s;
+  color: white;
+}
+
+.productCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.55);
+}
+
+.productImageBox {
+  height: 235px;
+  background: #222;
+  overflow: hidden;
+}
+
+.productImageBox img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: 0.35s;
+}
+
+.productCard:hover .productImageBox img {
+  transform: scale(1.06);
+}
+
+.productContent {
+  padding: 22px;
 }
 
 .productCard h3 {
-  font-size: 24px;
-  margin-bottom: 12px;
+  font-size: 23px;
+  margin-bottom: 10px;
   color: #d4af37;
 }
 
-/*.productCard p {*/
-/*  color: #4b5563;*/
-/*  margin-bottom: 16px;*/
-/*  line-height: 1.5;*/
-/*}*/
+.productCard p {
+  min-height: 48px;
+  color: #d1d1d1;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
 
 .productCard strong {
-  color: #ffffff;
+  color: #fff;
   font-size: 20px;
 }
 
-.infoBox {
-  background-color: #ffffff;
+.productButton {
+  display: inline-block;
+  margin-top: 18px;
+  padding: 10px 16px;
   border: 1px solid #d4af37;
-  border-radius: 14px;
-  padding: 24px;
+  border-radius: 8px;
+  color: #d4af37;
+  font-weight: 800;
+  transition: 0.25s;
+}
+
+.productCard:hover .productButton {
+  background: #d4af37;
+  color: #000;
+}
+
+/* ================= PROCESS SECTION ================= */
+
+.processSection {
+  background:
+          radial-gradient(circle at center, rgba(212, 175, 55, 0.08), transparent 35%),
+          #080808;
+}
+
+.processGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+}
+
+.processStep {
+  background: #151515;
+  border: 1px solid rgba(212, 175, 55, 0.32);
+  border-radius: 20px;
+  padding: 28px 20px;
+  text-align: center;
+}
+
+.processIcon {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 14px;
+  border: 1px solid #d4af37;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d4af37;
+  font-size: 26px;
+}
+
+.processNumber {
+  display: block;
+  color: #d4af37;
+  font-weight: 900;
+  margin-bottom: 16px;
+}
+
+.processStep h3 {
+  color: #fff;
+  margin-bottom: 12px;
+  font-size: 20px;
+}
+
+.processStep p {
+  color: #cfcfcf;
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+
+/* ================= ABOUT SECTION ================= */
+
+.aboutSection {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 70px;
+  align-items: center;
+  padding: 90px 60px;
+  background: #0a0a0a;
+}
+
+.aboutLeft h2 {
+  color: white;
+  font-size: 58px;
+  line-height: 1.1;
+  margin-bottom: 24px;
+}
+
+.aboutLeft p {
+  color: #d0d0d0;
+  font-size: 20px;
+  line-height: 1.7;
+  max-width: 500px;
+}
+
+.aboutFlow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 35px;
+}
+
+.aboutCard {
+  width: 320px;
+  text-align: center;
+}
+
+.aboutCard img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 20px;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  background: #151515;
+}
+
+.aboutCard span {
+  display: block;
+  margin-top: 16px;
+  color: white;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.aboutArrow {
+  width: 70px;
+  height: 70px;
+  background: #d4af37;
+  color: black;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.aboutDetails {
+  margin-top: 30px;
+}
+
+.aboutDetails summary {
+  display: inline-block;
+  background: #d4af37;
+  color: black;
+  padding: 15px 28px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 800;
+  list-style: none;
+}
+
+.aboutDetails summary::-webkit-details-marker {
+  display: none;
+}
+
+.aboutMoreText {
+  margin-top: 20px;
+  color: #d0d0d0;
   line-height: 1.8;
-  color: #000000; /* 👈 هذا المهم */
+}
+
+
+/* ================= FOOTER ================= */
+
+.footer {
+  background: #080808;
+  border-top: 1px solid rgba(212, 175, 55, 0.35);
+  padding: 55px 60px 22px;
+  color: #d8d8d8;
+}
+
+.footerContent {
+  display: grid;
+  grid-template-columns: 1.3fr 1.45fr 0.8fr 0.8fr 0.8fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.footerLogoArea {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.footerLogoArea img {
+  width: 80px;
+  height: auto;
+}
+
+.footerLogoArea h3 {
+  color: #d4af37;
+  font-size: 24px;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.footerBrand p {
+  max-width: 280px;
+  line-height: 1.7;
+  color: #bdbdbd;
+  margin-top: 0;
+}
+
+.footerColumn h4 {
+  color: #d4af37;
+  margin: 0 0 18px;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+.footerColumn a {
+  display: block;
+  color: #cfcfcf;
+  margin-bottom: 10px;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.footerColumn a:hover {
+  color: #d4af37;
+}
+
+.footerContact {
+  min-width: 390px;
+}
+
+.footerContactLink {
+  display: grid !important;
+  grid-template-columns: 28px 1fr;
+  align-items: center;
+  gap: 12px;
+  color: #cfcfcf;
+  text-decoration: none;
+  margin-bottom: 14px;
+}
+
+.footerContactLink i {
+  color: #d4af37;
+  font-size: 18px;
+  width: 28px;
+  text-align: center;
+}
+
+.footerContactLink span {
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.footerSocials {
+  display: flex;
+  gap: 12px;
+}
+
+.footerSocials a {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #1b1b1b;
+  color: #d4af37;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+}
+
+.footerSocials a:hover {
+  background: #d4af37;
+  color: #000;
+}
+
+.footerBottom {
+  margin-top: 38px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+  color: #9b9b9b;
+  font-size: 14px;
+}
+
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1200px) {
+  .processGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .aboutSection {
+    grid-template-columns: 1fr;
+  }
+
+  .footerContent {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .processGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .aboutSection {
+    padding: 60px 24px;
+    gap: 40px;
+  }
+
+  .aboutLeft h2 {
+    font-size: 42px;
+  }
+
+  .aboutLeft p {
+    font-size: 17px;
+  }
+
+  .aboutFlow {
+    flex-direction: column;
+  }
+
+  .aboutArrow {
+    transform: rotate(90deg);
+  }
+
+  .aboutCard {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .footer {
+    padding: 45px 24px 20px;
+  }
+
+  .footerContent {
+    grid-template-columns: 1fr;
+  }
+
+  .footerContact {
+    min-width: 0;
+  }
+
+  .footerContactLink span {
+    white-space: normal;
+  }
 }

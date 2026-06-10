@@ -1,0 +1,181 @@
+/* VISITENKARTEN PAGE */
+
+.vkPage {
+    min-height: 100vh;
+    background: #f5f5f5;
+    padding: 40px;
+}
+
+.vkContainer {
+    max-width: 1700px;
+    margin: 0 auto;
+
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 380px;
+    gap: 30px;
+    align-items: start;
+}
+
+.vkPreview,
+.vkOptions,
+.vkSummary {
+    background: white;
+    border-radius: 18px;
+    border: 1px solid #e5e5e5;
+    padding: 24px;
+}
+
+.vkPreview h1 {
+    font-size: 42px;
+    color: #111;
+    margin-bottom: 20px;
+}
+
+.vkMainImage {
+    width: 100%;
+    border-radius: 14px;
+    display: block;
+}
+
+.vkGallery {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.vkGallery img {
+    width: 120px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid #d4af37;
+    cursor: pointer;
+}
+
+.vkOptions h2 {
+    color: #111;
+    font-size: 28px;
+    margin-bottom: 30px;
+}
+
+.vkOptionBox {
+    margin-bottom: 28px;
+}
+
+.vkOptionBox label {
+    display: block;
+    color: #111;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.vkButtons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.vkButtons button {
+    height: 54px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.vkButtons button:hover {
+    border-color: #d4af37;
+    color: #d4af37;
+}
+
+.vkDesignOptions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.vkDesignCard {
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.vkDesignCard:hover {
+    border-color: #d4af37;
+}
+
+.vkDesignCard h3 {
+    color: #111;
+    margin-bottom: 10px;
+}
+
+.vkDesignCard p {
+    color: #666;
+    margin: 0;
+}
+
+.vkSummary {
+    position: sticky;
+    top: 100px;
+}
+
+.vkSummary h2 {
+    color: #111;
+    margin-bottom: 24px;
+}
+
+.vkSummaryItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 14px 0;
+    border-bottom: 1px solid #ececec;
+}
+
+.vkSummaryItem span {
+    color: #666;
+}
+
+.vkSummaryItem strong {
+    color: #111;
+}
+
+.vkCartButton {
+    width: 100%;
+    margin-top: 25px;
+
+    height: 58px;
+
+    background: #d4af37;
+    color: black;
+
+    border: none;
+    border-radius: 12px;
+
+    font-size: 17px;
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+.vkCartButton:hover {
+    background: #f5cc4b;
+}
+
+@media (max-width: 1200px) {
+    .vkContainer {
+        grid-template-columns: 1fr;
+    }
+
+    .vkSummary {
+        position: static;
+    }
+}
