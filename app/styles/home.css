@@ -677,3 +677,61 @@
     white-space: normal;
   }
 }
+
+@media (max-width: 900px) {
+  .topHeader {
+    position: static;
+    padding: 18px 24px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .logoArea {
+    width: 100%;
+    align-items: center;
+  }
+
+  .logoImg {
+    height: 54px;
+  }
+
+  .logoText h1 {
+    font-size: 22px;
+    line-height: 1.1;
+  }
+
+  .logoText p {
+    font-size: 13px;
+  }
+
+  .headerActions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .headerItem,
+  .cartHeaderButton {
+    width: 100%;
+    text-align: center;
+    font-size: 15px;
+    padding: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    border-radius: 10px;
+  }
+
+  .cartHeaderButton {
+    grid-column: span 2;
+  }
+
+  .heroSection {
+    grid-template-columns: 1fr;
+    padding: 55px 24px;
+  }
+
+  .heroText h2 {
+    font-size: 48px;
+  }
+}
