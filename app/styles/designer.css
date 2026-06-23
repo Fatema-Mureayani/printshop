@@ -1,0 +1,914 @@
+/* visitenkarten online design */
+.designerPage {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: #f5f6f8;
+    color: #111;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.designerPage * {
+    box-sizing: border-box;
+}
+
+/* Top Bar */
+
+.designerTopBar {
+    height: 78px;
+    width: 100%;
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 20px;
+    padding: 0 22px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    overflow: hidden;
+}
+
+.designerTopLeft,
+.designerTopCenter,
+.designerTopRight {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.designerTopCenter {
+    justify-content: center;
+    color: #777;
+    font-size: 13px;
+}
+
+.designerTopRight {
+    justify-content: flex-end;
+}
+
+.designerLogoMark {
+    width: 34px;
+    height: 34px;
+    border: 3px solid #d6af28;
+    border-radius: 8px;
+    font-size: 0;
+    flex-shrink: 0;
+}
+
+.designerPage button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.designerBackButton,
+.designerTopCenter button,
+.designerZoom button,
+.designerTemplateCard,
+.designerQuickActions button,
+.designerPages button {
+    background: #fff;
+    color: #111;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+}
+
+.designerBackButton {
+    padding: 10px 16px;
+}
+
+.designerTopCenter button {
+    width: 42px;
+    height: 42px;
+    font-size: 18px;
+}
+
+.designerZoom {
+    height: 42px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.designerZoom button {
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 0;
+    font-weight: 800;
+}
+
+.designerZoom span {
+    padding: 0 16px;
+    font-weight: 700;
+}
+
+.designerFinishTopButton {
+    background: #d6af28 !important;
+    color: #111 !important;
+    border: none !important;
+    padding: 14px 22px;
+    border-radius: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* Main Layout */
+
+.designerLayout {
+    width: 100%;
+    height: calc(100vh - 78px);
+    display: grid;
+    grid-template-columns: 360px minmax(0, 1fr) 330px;
+    overflow: hidden;
+}
+
+.designerSidebar,
+.designerRightPanel {
+    height: calc(100vh - 78px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #fff;
+    padding: 28px 30px;
+}
+
+.designerSidebar {
+    border-right: 1px solid #e5e7eb;
+}
+
+.designerRightPanel {
+    border-left: 1px solid #e5e7eb;
+}
+
+/* Left Sidebar */
+
+.designerSectionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.designerSectionHeader h2,
+.designerSectionTitle h2,
+.designerRightPanel h2 {
+    font-size: 22px;
+    margin: 0;
+}
+
+.designerSectionHeader button {
+    background: transparent;
+    border: none;
+    color: #c99b00;
+    font-weight: 700;
+}
+
+.designerTemplateGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 28px;
+}
+
+.designerTemplateCard {
+    padding: 8px;
+    text-align: left;
+}
+
+.designerTemplateCard strong {
+    display: block;
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+.designerTemplateActive {
+    border-color: #d6af28;
+    box-shadow: 0 0 0 2px rgba(214, 175, 40, 0.25);
+}
+
+.templatePreviewMini {
+    height: 86px;
+    border: 2px solid;
+    border-radius: 8px;
+    position: relative;
+    padding: 10px;
+    overflow: hidden;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.templateMiniLine {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 8px;
+    height: 100%;
+}
+
+.templateMiniContent {
+    position: relative;
+    margin-left: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 10px;
+}
+
+.templateMiniContent strong {
+    font-size: 11px;
+}
+
+.templateMiniContent small {
+    opacity: 0.7;
+}
+
+.templatePreview-darkGold {
+    background: #111 !important;
+    color: #fff !important;
+}
+
+.templatePreview-blue::after {
+    content: "";
+    position: absolute;
+    right: -18px;
+    bottom: -18px;
+    width: 70px;
+    height: 70px;
+    background: rgba(37, 99, 235, 0.2);
+    transform: rotate(45deg);
+}
+
+.templatePreview-green {
+    background: #f8fff9 !important;
+}
+
+/* Form */
+
+.designerSectionTitle {
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 12px;
+    margin-bottom: 18px;
+}
+
+.designerInputRow {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 12px;
+    align-items: start;
+    margin-bottom: 14px;
+}
+
+.designerFieldIcon,
+.designerInputRow > span {
+    width: 44px;
+    height: 44px;
+    background: #f5f5f5;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    flex-shrink: 0;
+    font-weight: 700;
+}
+
+.designerFieldIcon svg {
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.designerInputRow label {
+    display: block;
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+
+.designerInputRow input {
+    width: 100%;
+    height: 40px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0 12px;
+    font-size: 14px;
+}
+
+.designerInputRow input[type="file"] {
+    height: auto;
+    padding: 10px;
+}
+
+.designerInputRow small {
+    display: block;
+    margin-top: 5px;
+    color: #777;
+}
+
+.designerTextIcon {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.designerFontSizeRow {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.designerFontSizeRow input[type="range"] {
+    flex: 1;
+    accent-color: #d6af28;
+}
+
+.designerFontSizeValue {
+    min-width: 62px;
+    height: 42px;
+    border: 1px solid #d8d8d8;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    font-weight: 600;
+}
+
+/* Center Canvas */
+
+.designerCanvasArea {
+    width: 100%;
+    height: calc(100vh - 78px);
+    overflow: hidden;
+    background: radial-gradient(circle at center, #fff 0%, #f7f8fb 45%, #eef1f6 100%);
+    position: relative;
+    padding: 28px 30px 105px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.designerFormatBadge {
+    border: 1px solid #d8dde6;
+    background: #fff;
+    color: #777;
+    padding: 7px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    margin-bottom: 35px;
+}
+
+.designerWorkSurface {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: calc(100vh - 230px);
+    border: 1px dashed #cfd5df;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.businessCardPreview {
+    width: min(660px, 82%);
+    aspect-ratio: 85 / 55;
+    height: auto;
+    border: 3px solid;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.14);
+}
+
+/* Classic Card */
+
+.cardAccentLine {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18px;
+    height: 100%;
+}
+
+.designerCardLogoArea {
+    position: absolute;
+    left: 11%;
+    top: 28%;
+    width: 28%;
+    text-align: center;
+}
+
+.designerCardLogoArea strong {
+    display: block;
+    font-size: 26px;
+    letter-spacing: 2px;
+    margin-top: 10px;
+}
+
+.designerCardLogoArea span {
+    font-size: 13px;
+    letter-spacing: 4px;
+}
+
+.designerFakeLogo {
+    width: 80px;
+    height: 80px;
+    border: 4px solid currentColor;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    font-weight: 900;
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+}
+
+.designerLogo {
+    max-width: 100px;
+    max-height: 80px;
+    object-fit: contain;
+}
+
+.designerDivider {
+    position: absolute;
+    left: 46%;
+    top: 21%;
+    width: 3px;
+    height: 60%;
+}
+
+.cardTextContent {
+    position: absolute;
+    left: 52%;
+    top: 23%;
+    right: 8%;
+}
+
+.selectedTextBox {
+    border: 2px solid #60a5fa;
+    padding: 12px 18px;
+    margin-bottom: 24px;
+    position: relative;
+}
+
+.selectedTextBox::before,
+.selectedTextBox::after {
+    content: "";
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    background: #fff;
+    border: 2px solid #60a5fa;
+}
+
+.selectedTextBox::before {
+    left: -7px;
+    top: -7px;
+}
+
+.selectedTextBox::after {
+    right: -7px;
+    bottom: -7px;
+}
+
+.cardTextContent h2 {
+    margin: 0;
+    font-weight: 900;
+}
+
+.cardTextContent p {
+    margin: 4px 0 0;
+    font-weight: 800;
+}
+
+.cardContact,
+.blueContact {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 17px;
+}
+
+.cardContactItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cardContactIcon {
+    width: 22px;
+    height: 22px;
+    color: #d6af28;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.cardContactIcon svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Page Tabs */
+
+.designerPages {
+    position: absolute;
+    bottom: 35px;
+    display: flex;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.designerPages button {
+    border: none;
+    background: #fff;
+    padding: 18px 58px;
+    font-weight: 800;
+    border-bottom: 4px solid transparent;
+    border-radius: 0;
+}
+
+.designerPages .designerPageActive {
+    border-bottom-color: #d6af28;
+}
+
+/* Back Card */
+
+.cardBackContent {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    text-align: center;
+}
+
+.cardBackContent h2 {
+    margin: 0;
+    font-size: 42px;
+    letter-spacing: 3px;
+}
+
+.designerLogoBack {
+    max-width: 150px;
+    max-height: 90px;
+    object-fit: contain;
+}
+
+.cardBackLine {
+    width: 70%;
+    height: 5px;
+    border-radius: 999px;
+}
+
+/* Other Template Cards */
+
+.cardDarkGoldLayout {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.cardBlueLayout {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.cardGreenLayout {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.darkGoldShape {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 29%;
+    height: 100%;
+    background: linear-gradient(90deg, #d6af28, #141414);
+    opacity: 0.8;
+}
+
+.darkGoldShape::after {
+    content: "";
+    position: absolute;
+    left: 52%;
+    top: 0;
+    width: 48%;
+    height: 100%;
+    border-right: 2px solid #d6af28;
+    clip-path: polygon(0 0, 100% 35%, 55% 50%, 100% 65%, 0 100%);
+    background: rgba(214, 175, 40, 0.15);
+}
+
+.darkGoldContent {
+    position: absolute;
+    left: 38%;
+    top: 16%;
+    right: 10%;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.darkGoldContent h2 {
+    font-size: 34px;
+    margin: 0;
+    letter-spacing: 1px;
+}
+
+.darkGoldLine {
+    height: 3px;
+    width: 100%;
+    margin: 10px 0;
+}
+
+.blueLeftBar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 28px;
+    height: 100%;
+    background: linear-gradient(#2563eb, #0f172a);
+}
+
+.bluePolygon {
+    position: absolute;
+    right: -45px;
+    bottom: -45px;
+    width: 210px;
+    height: 210px;
+    background: rgba(37, 99, 235, 0.14);
+    clip-path: polygon(50% 0, 100% 30%, 80% 100%, 20% 100%, 0 30%);
+}
+
+.blueContent {
+    position: absolute;
+    left: 13%;
+    top: 22%;
+    right: 14%;
+}
+
+.blueContent h2 {
+    font-size: 32px;
+    margin: 0;
+}
+
+.blueContent p {
+    margin-top: 6px;
+    font-weight: 700;
+}
+
+.blueContact {
+    margin-top: 45px;
+}
+
+.greenLeftBar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 28px;
+    height: 100%;
+}
+
+.greenLogoBlock {
+    position: absolute;
+    left: 11%;
+    top: 30%;
+    width: 27%;
+    text-align: center;
+}
+
+.greenLogoBlock strong {
+    display: block;
+    margin-top: 12px;
+    font-size: 24px;
+}
+
+.greenDivider {
+    position: absolute;
+    left: 46%;
+    top: 21%;
+    width: 3px;
+    height: 60%;
+}
+
+.greenContent {
+    position: absolute;
+    left: 52%;
+    top: 22%;
+    right: 8%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.greenContent h2 {
+    margin: 0;
+    font-size: 32px;
+}
+
+.greenContent p {
+    margin: 0 0 20px;
+    font-weight: 700;
+}
+
+/* Right Panel */
+
+.designerProductInfo p {
+    margin: 10px 0;
+}
+
+.designerRightPanel hr {
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    margin: 24px 0;
+}
+
+.designerRightPanel h3 {
+    margin: 22px 0 14px;
+}
+
+.designerQuickActions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.designerQuickActions button {
+    width: 100%;
+    padding: 12px;
+    text-align: left;
+}
+
+.designerLayers {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.designerLayers div {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.designerLayers div:last-child {
+    border-bottom: none;
+}
+
+.designerTipBox {
+    margin-top: 26px;
+    background: #fff8e6;
+    border: 1px solid #f0d58a;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.designerTipBox p {
+    margin-bottom: 0;
+    color: #555;
+}
+
+.designerColorPanel {
+    margin-top: 14px;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #fafafa;
+}
+
+.designerColorPanel h4 {
+    margin: 0 0 14px;
+    font-size: 16px;
+}
+
+.designerColorRow {
+    display: grid;
+    grid-template-columns: 1fr 48px 80px;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.designerColorRow:last-child {
+    margin-bottom: 0;
+}
+
+.designerColorRow label {
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.designerColorRow input[type="color"] {
+    width: 44px;
+    height: 38px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.designerColorRow span {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .designerLayout {
+        grid-template-columns: 310px minmax(0, 1fr) 280px;
+    }
+
+    .designerSidebar,
+    .designerRightPanel {
+        padding: 22px;
+    }
+
+    .businessCardPreview {
+        width: min(560px, 84%);
+    }
+
+    .cardTextContent,
+    .greenContent {
+        left: 51%;
+    }
+
+    .darkGoldContent {
+        left: 36%;
+    }
+}
+
+@media (max-width: 900px) {
+    .designerTopBar {
+        height: auto;
+        grid-template-columns: 1fr;
+        padding: 14px;
+    }
+
+    .designerLayout {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        overflow-y: auto;
+    }
+
+    .designerPage {
+        overflow-y: auto;
+    }
+
+    .designerSidebar,
+    .designerRightPanel,
+    .designerCanvasArea {
+        height: auto;
+    }
+
+    .designerTemplateGrid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .designerCanvasArea {
+        padding: 24px 12px 110px;
+    }
+
+    .designerWorkSurface {
+        height: 420px;
+    }
+
+    .businessCardPreview {
+        width: min(500px, 92%);
+    }
+
+    .designerPages button {
+        padding: 14px 34px;
+    }
+}

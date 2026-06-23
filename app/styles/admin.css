@@ -173,6 +173,14 @@
   background: #eab308;
 }
 
+.statusLockedMessage {
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #f3f3f3;
+  color: #333;
+  font-weight: 700;
+}
+
 .adminLoadingText,
 .adminEmptyText {
   color: white;
@@ -230,6 +238,33 @@
   color: white;
   font-size: 16px;
   margin: 0;
+}
+
+.adminProductDetails {
+  grid-column: 1 / -1;
+  line-height: 1.7;
+  white-space: normal;
+}
+
+.adminFileLink {
+  color: #facc15;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.adminDruckdatenPreviewBox {
+  grid-column: 1 / -1;
+  margin-top: 12px;
+}
+
+.adminDruckdatenPreview {
+  width: 220px;
+  max-height: 160px;
+  object-fit: contain;
+  border: 1px solid #444;
+  border-radius: 8px;
+  background-color: white;
+  padding: 8px;
 }
 
 @media (max-width: 900px) {

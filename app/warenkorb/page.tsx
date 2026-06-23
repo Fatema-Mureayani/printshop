@@ -12,6 +12,10 @@ type CartItem = {
     size: string;
     customText: string;
     description: string;
+    druckdatenOption?: string;
+    druckdatenFileName?: string;
+    druckdatenFileUrl?: string;
+    designWishes?: string;
     font: string;
     fontSize: number;
     textColor: string;
@@ -127,6 +131,10 @@ export default function WarenkorbPage() {
                     size: item.size,
                     customText: item.customText,
                     description: item.description,
+                    druckdatenOption: item.druckdatenOption,
+                    druckdatenFileName: item.druckdatenFileName,
+                    druckdatenFileUrl: item.druckdatenFileUrl,
+                    designWishes: item.designWishes,
                     font: item.font,
                     fontSize: item.fontSize,
                     textColor: item.textColor,
@@ -205,22 +213,77 @@ export default function WarenkorbPage() {
                                 <div className="cartItemInfo">
                                     <h3>{item.productName}</h3>
 
-                                    <p>
-                                        <strong>Farbe:</strong> {item.color}
-                                    </p>
+                                    {item.productName === "Visitenkarten" ? (
+                                        <>
+                                            <p>
+                                                <strong>Seiten:</strong> {item.color}
+                                            </p>
 
-                                    <p>
-                                        <strong>Größe:</strong> {item.size}
-                                    </p>
+                                            <p>
+                                                <strong>Menge:</strong> {item.size}
+                                            </p>
 
-                                    <p>
-                                        <strong>Text:</strong> {item.customText || "-"}
-                                    </p>
+                                            <p>
+                                                <strong>Format:</strong> {item.customText}
+                                            </p>
 
-                                    <p>
-                                        <strong>Beschreibung:</strong>{" "}
-                                        {item.description || "-"}
-                                    </p>
+                                            <p style={{ whiteSpace: "pre-line" }}>
+                                                <strong>Details:</strong>
+                                                <br />
+                                                {item.description || "-"}
+                                            </p>
+
+                                            {item.druckdatenOption && (
+                                                <p>
+                                                    <strong>Druckdaten:</strong> {item.druckdatenOption}
+                                                </p>
+                                            )}
+
+                                            {item.druckdatenFileName && (
+                                                <p>
+                                                    <strong>Datei:</strong> {item.druckdatenFileName}
+                                                </p>
+                                            )}
+
+                                            {item.druckdatenFileUrl && (
+                                                <p>
+                                                    <strong>Datei-Link:</strong>{" "}
+                                                    <a
+                                                        href={`http://localhost:5098${item.druckdatenFileUrl}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        Druckdatei öffnen
+                                                    </a>
+                                                </p>
+                                            )}
+
+                                            {item.designWishes && (
+                                                <p>
+                                                    <strong>Designwünsche:</strong> {item.designWishes}
+                                                </p>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p>
+                                                <strong>Farbe:</strong> {item.color}
+                                            </p>
+
+                                            <p>
+                                                <strong>Größe:</strong> {item.size}
+                                            </p>
+
+                                            <p>
+                                                <strong>Text:</strong> {item.customText || "-"}
+                                            </p>
+
+                                            <p>
+                                                <strong>Beschreibung:</strong>{" "}
+                                                {item.description || "-"}
+                                            </p>
+                                        </>
+                                    )}
 
                                     <p>
                                         <strong>Preis:</strong> {item.price.toFixed(2)} €

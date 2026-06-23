@@ -11,6 +11,10 @@ type Order = {
     size: string;
     customText: string | null;
     description: string | null;
+    druckdatenOption: string | null;
+    druckdatenFileName: string | null;
+    druckdatenFileUrl: string | null;
+    designWishes: string | null;
     font: string | null;
     fontSize: number;
     textColor: string | null;
@@ -100,6 +104,14 @@ export default function AdminOrdersPage() {
         action: "confirm" | "reject"
     ) {
         try {
+            const actionText = action === "confirm" ? "bestätigen" : "ablehnen";
+
+            const confirmed = window.confirm(
+                `Möchten Sie diese Bestellung wirklich ${actionText}? Danach kann der Status nicht erneut geändert werden.`
+            );
+
+            if (!confirmed) return;
+
             const res = await fetch(
                 `http://localhost:5098/api/Orders/group/${orderGroupId}/${action}`,
                 {
@@ -107,9 +119,14 @@ export default function AdminOrdersPage() {
                 }
             );
 
+            const data = await res.json();
+
             if (!res.ok) {
-                throw new Error("Status konnte nicht geändert werden");
+                alert(data.message || data.Message || "Status konnte nicht geändert werden");
+                return;
             }
+
+            alert(data.message || data.Message || "Status wurde erfolgreich geändert");
 
             await loadOrders();
         } catch (error) {
@@ -259,54 +276,168 @@ export default function AdminOrdersPage() {
                                             <h3>Produkte dieser Bestellung</h3>
 
                                             <div className="adminProductsList">
-                                                {group.items.map((item, index) => (
-                                                    <div
-                                                        key={item.id}
-                                                        className="adminProductItem"
-                                                    >
-                                                        <h4>
-                                                            T-Shirt {index + 1} ·{" "}
-                                                            {item.productName}
-                                                        </h4>
+                                                {group.items.map((item, index) => {
+                                                    const isVisitenkarte = item.productName === "Visitenkarten";
 
-                                                        <div className="adminProductGrid">
-                                                            <p>
-                                                                <strong>Farbe:</strong>{" "}
-                                                                {item.color}
-                                                            </p>
-                                                            <p>
-                                                                <strong>Größe:</strong>{" "}
-                                                                {item.size}
-                                                            </p>
-                                                            <p>
-                                                                <strong>Menge:</strong>{" "}
-                                                                {item.quantity}
-                                                            </p>
-                                                            <p>
-                                                                <strong>Preis:</strong>{" "}
-                                                                {Number(
-                                                                    item.price
-                                                                ).toFixed(2)} €
-                                                            </p>
-                                                            <p>
-                                                                <strong>Text:</strong>{" "}
-                                                                {item.customText || "-"}
-                                                            </p>
-                                                            <p>
-                                                                <strong>Beschreibung:</strong>{" "}
-                                                                {item.description || "-"}
-                                                            </p>
-                                                            <p>
-                                                                <strong>Schrift:</strong>{" "}
-                                                                {item.font || "-"}
-                                                            </p>
-                                                            <p>
-                                                                <strong>Textfarbe:</strong>{" "}
-                                                                {item.textColor || "-"}
-                                                            </p>
+                                                    return (
+                                                        <div
+                                                            key={item.id}
+                                                            className="adminProductItem"
+                                                        >
+                                                            <h4>
+                                                                {isVisitenkarte
+                                                                    ? `Visitenkarten ${index + 1}`
+                                                                    : `T-Shirt ${index + 1}`}
+                                                            </h4>
+
+                                                            {isVisitenkarte ? (
+                                                                <div className="adminProductGrid">
+                                                                    <p>
+                                                                        <strong>Produkt:</strong>{" "}
+                                                                        {item.productName}
+                                                                    </p>
+
+                                                                    <p>
+                                                                        <strong>Seiten:</strong>{" "}
+                                                                        {item.color}
+                                                                    </p>
+
+                                                                    <p>
+                                                                        <strong>Bestellte Menge:</strong>{" "}
+                                                                        {item.size}
+                                                                    </p>
+
+                                                                    <p>
+                                                                        <strong>Anzahl im Warenkorb:</strong>{" "}
+                                                                        {item.quantity}
+                                                                    </p>
+
+                                                                    <p>
+                                                                        <strong>Format:</strong>{" "}
+                                                                        {item.customText || "-"}
+                                                                    </p>
+
+                                                                    <p>
+                                                                        <strong>Preis:</strong>{" "}
+                                                                        {Number(item.price).toFixed(2).replace(".", ",")} €
+                                                                    </p>
+
+                                                                    <p className="adminProductDetails">
+                                                                        <strong>Details:</strong>
+                                                                        <br />
+                                                                        {(item.description || "-")
+                                                                            .split("\n")
+                                                                            .map((line, lineIndex) => (
+                                                                                <span key={lineIndex}>
+                                                                                     {line}
+                                                                                    <br />
+                                                                                </span>
+                                                                            ))}
+                                                                    </p>
+
+                                                                    {item.druckdatenOption && (
+                                                                        <p>
+                                                                            <strong>Druckdaten:</strong>{" "}
+                                                                            {item.druckdatenOption}
+                                                                        </p>
+                                                                    )}
+
+                                                                    {item.druckdatenFileName && (
+                                                                        <p>
+                                                                            <strong>Datei:</strong>{" "}
+                                                                            {item.druckdatenFileName}
+                                                                        </p>
+                                                                    )}
+
+                                                                    {item.druckdatenFileUrl && (
+                                                                        <p>
+                                                                            <strong>Druckdatei:</strong>{" "}
+                                                                            <a
+                                                                                href={`http://localhost:5098${item.druckdatenFileUrl}`}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="adminFileLink"
+                                                                            >
+                                                                                Datei öffnen
+                                                                            </a>
+                                                                        </p>
+                                                                    )}
+
+                                                                    {item.druckdatenFileUrl &&
+                                                                        (
+                                                                            item.druckdatenFileUrl.toLowerCase().endsWith(".png") ||
+                                                                            item.druckdatenFileUrl.toLowerCase().endsWith(".jpg") ||
+                                                                            item.druckdatenFileUrl.toLowerCase().endsWith(".jpeg")
+                                                                        ) && (
+                                                                            <div className="adminDruckdatenPreviewBox">
+                                                                                <img
+                                                                                    src={`http://localhost:5098${item.druckdatenFileUrl}`}
+                                                                                    alt="Druckdatei Vorschau"
+                                                                                    className="adminDruckdatenPreview"
+                                                                                />
+                                                                            </div>
+                                                                        )}
+
+                                                                    {item.designWishes && (
+                                                                        <p className="adminProductDetails">
+                                                                            <strong>Designwünsche:</strong>
+                                                                            <br />
+                                                                            {item.designWishes}
+                                                                        </p>
+                                                                    )}
+
+                                                                </div>
+                                                            ) : (
+                                                                <div className="adminProductGrid">
+                                                                    <p>
+                                                                        <strong>Produkt:</strong>{" "}
+                                                                        {item.productName}
+                                                                    </p>
+
+                                                                    <p>
+                                                                        <strong>Farbe:</strong>{" "}
+                                                                        {item.color}
+                                                                    </p>
+
+                                                                    <p>
+                                                                        <strong>Größe:</strong>{" "}
+                                                                        {item.size}
+                                                                    </p>
+
+                                                                    <p>
+                                                                        <strong>Menge:</strong>{" "}
+                                                                        {item.quantity}
+                                                                    </p>
+
+                                                                    <p>
+                                                                        <strong>Text:</strong>{" "}
+                                                                        {item.customText || "-"}
+                                                                    </p>
+
+                                                                    <p>
+                                                                        <strong>Beschreibung:</strong>{" "}
+                                                                        {item.description || "-"}
+                                                                    </p>
+
+                                                                    <p>
+                                                                        <strong>Schrift:</strong>{" "}
+                                                                        {item.font || "-"}
+                                                                    </p>
+
+                                                                    <p>
+                                                                        <strong>Textfarbe:</strong>{" "}
+                                                                        {item.textColor || "-"}
+                                                                    </p>
+
+                                                                    <p>
+                                                                        <strong>Preis:</strong>{" "}
+                                                                        {Number(item.price).toFixed(2).replace(".", ",")} €
+                                                                    </p>
+                                                                </div>
+                                                            )}
                                                         </div>
-                                                    </div>
-                                                ))}
+                                                    );
+                                                })}
                                             </div>
                                         </div>
 
@@ -317,29 +448,37 @@ export default function AdminOrdersPage() {
                                             </p>
 
                                             <div className="adminActionButtons">
-                                                <button
-                                                    className="confirmButton"
-                                                    onClick={() =>
-                                                        updateOrderGroupStatus(
-                                                            group.orderGroupId,
-                                                            "confirm"
-                                                        )
-                                                    }
-                                                >
-                                                    Bestätigen
-                                                </button>
+                                                {group.status === "Pending" ? (
+                                                    <>
+                                                        <button
+                                                            className="confirmButton"
+                                                            onClick={() =>
+                                                                updateOrderGroupStatus(
+                                                                    group.orderGroupId,
+                                                                    "confirm"
+                                                                )
+                                                            }
+                                                        >
+                                                            Bestätigen
+                                                        </button>
 
-                                                <button
-                                                    className="rejectButton"
-                                                    onClick={() =>
-                                                        updateOrderGroupStatus(
-                                                            group.orderGroupId,
-                                                            "reject"
-                                                        )
-                                                    }
-                                                >
-                                                    Ablehnen
-                                                </button>
+                                                        <button
+                                                            className="rejectButton"
+                                                            onClick={() =>
+                                                                updateOrderGroupStatus(
+                                                                    group.orderGroupId,
+                                                                    "reject"
+                                                                )
+                                                            }
+                                                        >
+                                                            Ablehnen
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <div className="statusLockedMessage">
+                                                        Diese Bestellung wurde bereits {group.status}.
+                                                    </div>
+                                                )}
 
                                                 <button
                                                     className="deleteButton"

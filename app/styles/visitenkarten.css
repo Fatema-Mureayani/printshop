@@ -3,22 +3,25 @@
 .vkPage {
     min-height: 100vh;
     background: #f5f5f5;
-    padding: 40px;
+    padding: 30px;
+    overflow-x: hidden;
 }
 
 .vkContainer {
-    max-width: 1700px;
+    width: 100%;
+    max-width: 1500px;
     margin: 0 auto;
 
     display: grid;
-    grid-template-columns: 1fr 1.2fr 380px;
-    gap: 30px;
+    grid-template-columns: 360px minmax(0, 1fr) 300px;
+    gap: 24px;
     align-items: start;
 }
 
 .vkPreview,
 .vkOptions,
 .vkSummary {
+    min-width: 0;
     background: white;
     border-radius: 18px;
     border: 1px solid #e5e5e5;
@@ -26,7 +29,7 @@
 }
 
 .vkPreview h1 {
-    font-size: 42px;
+    font-size: 40px;
     color: #111;
     margin-bottom: 20px;
 }
@@ -44,14 +47,15 @@
 }
 
 .vkGallery img {
-    width: 120px;
-    height: 80px;
+    width: 140px;
+    height: 100px;
     object-fit: cover;
     border-radius: 10px;
     border: 2px solid #d4af37;
     cursor: pointer;
 }
 
+{/* Druckdaten */}
 .vkOptions h2 {
     color: #111;
     font-size: 28px;
@@ -91,68 +95,177 @@
     border-color: #d4af37;
     color: #d4af37;
 }
-
+{/* Druckdaten */}
 .vkDesignOptions {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+    overflow: hidden;
 }
 
 .vkDesignCard {
-    border: 1px solid #ddd;
-    border-radius: 14px;
-    padding: 20px;
+    position: relative;
+
+    width: 100%;
+    height: 260px;
+    min-width: 0;
+    box-sizing: border-box;
+
+    padding: 24px 18px 20px;
+
+    border: 2px solid #ddd;
+    border-radius: 16px;
+
+    background: white;
     text-align: center;
+
     cursor: pointer;
     transition: 0.2s;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .vkDesignCard:hover {
     border-color: #d4af37;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+}
+
+.vkDesignCard.vkDesignSelected {
+    border-color: #d4af37;
+    background: #fffdf6;
+}
+
+.vkRadioCircle {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+
+    width: 22px;
+    height: 22px;
+
+    border-radius: 50%;
+    border: 2px solid #d9d9d9;
+
+    background: white;
+}
+
+.vkDesignSelected .vkRadioCircle {
+    border: 7px solid #d4af37;
+}
+
+.vkDesignIcon {
+    width: 42px;
+    height: 42px;
+
+    margin-bottom: 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vkDesignIcon svg {
+    width: 34px;
+    height: 34px;
+
+    fill: none;
+    stroke: #111;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .vkDesignCard h3 {
     color: #111;
-    margin-bottom: 10px;
+    font-size: 17px;
+    line-height: 1.25;
+    margin: 0 0 10px;
 }
 
 .vkDesignCard p {
     color: #666;
-    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+    margin: 0 0 14px;
 }
 
+.vkDesignCard strong {
+    margin-top: auto;
+
+    color: #111;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.vkDesignCard.vkDesignSelected h3 {
+    color: #d4af37;
+}
+
+@media (max-width: 1200px) {
+    .vkContainer {
+        grid-template-columns: 1fr;
+    }
+
+    .vkSummary {
+        position: static;
+    }
+}
+
+@media (max-width: 900px) {
+    .vkDesignOptions {
+        grid-template-columns: 1fr;
+    }
+
+    .vkDesignCard {
+        aspect-ratio: auto;
+        min-height: 220px;
+    }
+}
+
+{/* Ihre Auswahl */}
 .vkSummary {
     position: sticky;
     top: 100px;
+    padding: 22px;
 }
 
 .vkSummary h2 {
     color: #111;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
+    font-size: 26px;
 }
 
 .vkSummaryItem {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 14px;
 
-    padding: 14px 0;
+    padding: 12px 0;
     border-bottom: 1px solid #ececec;
 }
 
 .vkSummaryItem span {
     color: #666;
+    font-size: 15px;
 }
 
 .vkSummaryItem strong {
     color: #111;
+    font-size: 15px;
+    text-align: right;
+    max-width: 160px;
 }
 
 .vkCartButton {
     width: 100%;
-    margin-top: 25px;
+    margin-top: 22px;
 
-    height: 58px;
+    height: 54px;
 
     background: #d4af37;
     color: black;
@@ -160,7 +273,7 @@
     border: none;
     border-radius: 12px;
 
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 800;
 
     cursor: pointer;
@@ -178,4 +291,183 @@
     .vkSummary {
         position: static;
     }
+}
+
+/* Veredelung Bereich */
+
+.vkOptionLabelRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.vkOptionLabelRow label {
+    margin-bottom: 0;
+}
+
+.vkInfoIcon {
+    width: 18px;
+    height: 18px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    border: 1px solid #cfcfcf;
+
+    color: #888;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.vkFinishButtons {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.vkFinishButtons button {
+    height: 58px;
+    border-radius: 10px;
+    background: white;
+    color: #222;
+
+    border: 1px solid #e0e0e0;
+
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.vkButtons button.vkSelected {
+    border: 2px solid #d4af37;
+    background: #fffdf6;
+    color: #d4af37;
+}
+
+.vkHintBox {
+    margin-top: 26px;
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 18px 22px;
+
+    background: linear-gradient(90deg, #fff3c4, #fff8df);
+    border-radius: 12px;
+}
+
+.vkTruckIcon {
+    font-size: 24px;
+}
+
+.vkHintBox p {
+    margin: 0;
+    color: #222;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.vkHintBox strong {
+    font-weight: 800;
+}
+
+@media (max-width: 700px) {
+    .vkFinishButtons {
+        grid-template-columns: 1fr;
+    }
+
+    .vkHintBox {
+        align-items: flex-start;
+    }
+}
+
+/* Seiten Bereich */
+
+.vkSideButtons {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.vkSideButtons button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.vkSideIcon {
+    width: 24px;
+    height: 24px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 2px solid #bdbdbd;
+    border-radius: 4px;
+
+    color: #999;
+    font-size: 15px;
+    line-height: 1;
+}
+
+.vkUploadBox,
+.vkDesignServiceBox {
+    margin-top: 18px;
+    padding: 18px;
+    border: 1px solid #e5e5e5;
+    border-radius: 14px;
+    background-color: #fffdf7;
+}
+
+.vkUploadBox label,
+.vkDesignServiceBox label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #111;
+}
+
+.vkUploadBox input {
+    width: 100%;
+    padding: 12px;
+    border: 1px dashed #c9c9c9;
+    border-radius: 10px;
+    background-color: white;
+}
+
+.vkFileName {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+.vkDesignTextarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 14px;
+    border: 1px solid #d8d8d8;
+    border-radius: 12px;
+    resize: vertical;
+    font-size: 15px;
+    outline: none;
+}
+
+.vkDesignTextarea:focus {
+    border-color: #d6af28;
+}
+
+.vkExtraPrice {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #b98b00;
+}
+
+.vkSummaryInfo {
+    margin-top: -8px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: #666;
+    line-height: 1.4;
 }

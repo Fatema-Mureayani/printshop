@@ -60,7 +60,7 @@ export default async function Home() {
                     </div>
                 </div>
 
-                <div className="headerActions">
+                <nav className="headerActions">
                     <a href="#start" className="headerItem">Startseite</a>
                     <a href="#produkte" className="headerItem">Produkte</a>
                     <a href="#ueber-uns" className="headerItem">Über uns</a>
@@ -69,7 +69,26 @@ export default async function Home() {
                     <Link href="/warenkorb" className="cartHeaderButton">
                         Warenkorb
                     </Link>
-                </div>
+                </nav>
+
+                <details className="mobileMenu">
+                    <summary className="mobileMenuButton">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </summary>
+
+                    <div className="mobileMenuContent">
+                        <a href="#start">Startseite</a>
+                        <a href="#produkte">Produkte</a>
+                        <a href="#ueber-uns">Über uns</a>
+                        <a href="#kontakt">Kontakt</a>
+
+                        <Link href="/warenkorb">
+                            Warenkorb
+                        </Link>
+                    </div>
+                </details>
             </header>
 
             <section id="start" className="heroSection">
@@ -93,15 +112,15 @@ export default async function Home() {
 
                     <div className="heroFeatures">
                         <div>
-                            <span>✦</span>
+                            <i className="fa-solid fa-award"></i>
                             Premium Qualität
                         </div>
                         <div>
-                            <span>✎</span>
+                            <i className="fa-solid fa-pen-nib"></i>
                             Individuelles Design
                         </div>
                         <div>
-                            <span>☏</span>
+                            <i className="fa-brands fa-whatsapp"></i>
                             WhatsApp Kontakt
                         </div>
                     </div>
@@ -254,17 +273,29 @@ export default async function Home() {
 
                         <div className="aboutMoreText">
                             <p>
-                                MUR Printing steht für Qualität, Kreativität und Zuverlässigkeit.
+                                Mur Printing ist euer starker Partner für Werbemedien aller Art. Wir sorgen dafür, dass eure Firma sichtbar und ansprechend präsentiert wird. Bei uns bekommt ihr den kompletten Service aus einer Hand:
                             </p>
 
                             <p>
-                                Wir fertigen Visitenkarten, Banner, Textilien und viele weitere
-                                Druckprodukte individuell nach Kundenwunsch.
+                                Kreative Gestaltung: Wir entwickeln das passende Design nach euren Wünschen.
+                            </p>
+
+                            <p>
+                                Professionelle Umsetzung: Wir bringen die Ideen mit modernster Werbetechnik auf das richtige Material.
+                                Langjährige Erfahrung: Unser Team unterstützt und berät euch kompetent bei jedem Schritt.
+                            </p>
+
+                            <p>
+                                Höchste Qualität: Eure Zufriedenheit und ein perfektes Ergebnis stehen bei uns an erster Stelle.
                             </p>
 
                             <p>
                                 Unser Ziel ist es, professionelle Drucklösungen schnell und
                                 unkompliziert anzubieten.
+                            </p>
+
+                            <p>
+                                Wir freuen uns darauf, eure Ideen gemeinsam zum Leben zu erwecken – sprecht uns einfach an!
                             </p>
                         </div>
                     </details>
