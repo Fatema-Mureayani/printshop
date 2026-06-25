@@ -584,6 +584,76 @@
 
 /* Other Template Cards */
 
+.cardBlankLayout {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.blankCardContent {
+    position: absolute;
+    inset: 45px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.blankCardHeader {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.blankCardHeader h2 {
+    margin: 0;
+    font-weight: 900;
+}
+
+.blankCardHeader p {
+    margin: 6px 0 0;
+    font-weight: 800;
+}
+
+.blankLogoPlaceholder {
+    width: 95px;
+    height: 70px;
+    border: 2px dashed;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.blankContactList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45em;
+    min-width: 0;
+    width: 100%;
+}
+
+.blankContactList .cardContactIcon svg {
+    width: 1em;
+    height: 1em;
+}
+
+.templatePreview-blank {
+    background: #ffffff !important;
+    color: #111111 !important;
+}
+
+.templatePreview-blank::after {
+    content: "";
+    position: absolute;
+    inset: 14px;
+    border: 1px dashed #cfcfcf;
+    border-radius: 6px;
+}
+
 .cardDarkGoldLayout {
     width: 100%;
     height: 100%;
@@ -841,6 +911,205 @@
 .designerColorRow span {
     font-size: 12px;
     color: #666;
+}
+
+.designerBackgroundPanel {
+    margin-top: 14px;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #fafafa;
+}
+
+.designerBackgroundPanel h4 {
+    margin: 0 0 14px;
+    font-size: 16px;
+}
+
+.designerBackgroundPanel input {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.designerRemoveBackgroundButton {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 8px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.designerBackgroundPreview {
+    width: 100%;
+    height: 90px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background-size: cover;
+    background-position: center;
+}
+
+.designerBackgroundTarget {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.designerBackgroundTarget button {
+    padding: 10px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 8px;
+    font-weight: 700;
+}
+
+.designerBackgroundTarget .activeBackgroundTarget {
+    background: #fff8dc;
+    border-color: #d6af28;
+    color: #111;
+}
+
+/* Drag & Drop */
+
+.draggableCardElement {
+    position: absolute;
+    cursor: move;
+    user-select: none;
+    touch-action: none;
+    z-index: 5;
+}
+
+.draggableCardElement:hover {
+    outline: 2px dashed rgba(96, 165, 250, 0.8);
+    outline-offset: 4px;
+}
+
+.cardBlankLayout {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.blankLogoPlaceholder {
+    width: 105px;
+    height: 75px;
+    border: 2px dashed;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.55);
+}
+
+.blankNameBlock h2 {
+    margin: 0;
+    font-weight: 900;
+    line-height: 1.05;
+}
+
+.blankNameBlock p {
+    margin: 0.25em 0 0;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.blankContactList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 17px;
+    min-width: 260px;
+}
+
+.draggableCardElement {
+    position: absolute;
+    cursor: move;
+    user-select: none;
+    touch-action: none;
+    z-index: 5;
+    outline: 2px dashed rgba(96, 165, 250, 0.9);
+    outline-offset: 2px;
+}
+
+.draggableContent {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.resizeHandle {
+    position: absolute;
+    right: -7px;
+    bottom: -7px;
+    width: 14px;
+    height: 14px;
+    background: white;
+    border: 3px solid #60a5fa;
+    border-radius: 3px;
+    cursor: nwse-resize;
+    z-index: 10;
+}
+
+.resizeHandle::before {
+    content: "";
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    width: 5px;
+    height: 5px;
+    border-right: 2px solid #60a5fa;
+    border-bottom: 2px solid #60a5fa;
+}
+
+.blankLogoBlock {
+    width: 100%;
+    height: 100%;
+}
+
+.blankDesignerLogo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.blankLogoPlaceholder {
+    width: 100%;
+    height: 100%;
+}
+
+.cardBackContentEditable {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.backLogoBlock {
+    width: 100%;
+    height: 100%;
+}
+
+.backWebsiteText {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.cardBackLineEditable {
+    width: 100%;
+    height: 100%;
+    border-radius: 999px;
 }
 
 /* Responsive */

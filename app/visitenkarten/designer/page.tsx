@@ -1,18 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type Template = {
     id: string;
     name: string;
-    layout: "classic" | "darkGold" | "blue" | "green";
+    layout: "blank" | "classic" | "darkGold" | "blue" | "green";
     backgroundColor: string;
     textColor: string;
     accentColor: string;
 };
 
 const templates: Template[] = [
+    {
+        id: "blank",
+        name: "Leer / Weiß",
+        layout: "blank",
+        backgroundColor: "#ffffff",
+        textColor: "#111111",
+        accentColor: "#d6af28",
+    },
     {
         id: "classic",
         name: "Klassisch",
@@ -121,6 +130,127 @@ function DesignerIcon({ type }: { type: string }) {
     return null;
 }
 
+/*  كود Drag & Drop */
+type DraggableKey = "logo" | "name" | "contact"| "backLogo" | "backWebsite" | "backLine";
+
+type DragPosition = {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+};
+
+type DraggableElementProps = {
+    itemKey: DraggableKey;
+    position: DragPosition;
+    cardRef: React.RefObject<HTMLDivElement | null>;
+    onMove: (key: DraggableKey, position: DragPosition) => void;
+    children: ReactNode;
+};
+
+function DraggableElement({
+                              itemKey,
+                              position,
+                              cardRef,
+                              onMove,
+                              children,
+                          }: DraggableElementProps) {
+    function handlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
+        e.preventDefault();
+
+        const card = cardRef.current;
+        const element = e.currentTarget;
+
+        if (!card) return;
+
+        const cardRect = card.getBoundingClientRect();
+        const elementRect = element.getBoundingClientRect();
+
+        const offsetX = e.clientX - elementRect.left;
+        const offsetY = e.clientY - elementRect.top;
+
+        function handlePointerMove(moveEvent: PointerEvent) {
+            let newX =
+                ((moveEvent.clientX - cardRect.left - offsetX) / cardRect.width) * 100;
+
+            let newY =
+                ((moveEvent.clientY - cardRect.top - offsetY) / cardRect.height) * 100;
+
+            newX = Math.max(0, Math.min(newX, 100 - position.width));
+            newY = Math.max(0, Math.min(newY, 100 - position.height));
+
+            onMove(itemKey, {
+                ...position,
+                x: newX,
+                y: newY,
+            });
+        }
+
+        function handlePointerUp() {
+            window.removeEventListener("pointermove", handlePointerMove);
+            window.removeEventListener("pointerup", handlePointerUp);
+        }
+
+        window.addEventListener("pointermove", handlePointerMove);
+        window.addEventListener("pointerup", handlePointerUp);
+    }
+
+    function handleResizePointerDown(e: React.PointerEvent<HTMLSpanElement>) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const card = cardRef.current;
+
+        if (!card) return;
+
+        const cardRect = card.getBoundingClientRect();
+
+        function handlePointerMove(moveEvent: PointerEvent) {
+            const newWidth =
+                ((moveEvent.clientX - cardRect.left) / cardRect.width) * 100 - position.x;
+
+            const newHeight =
+                ((moveEvent.clientY - cardRect.top) / cardRect.height) * 100 - position.y;
+
+            onMove(itemKey, {
+                ...position,
+                width: Math.max(10, Math.min(newWidth, 100 - position.x)),
+                height: Math.max(10, Math.min(newHeight, 100 - position.y)),
+            });
+        }
+
+        function handlePointerUp() {
+            window.removeEventListener("pointermove", handlePointerMove);
+            window.removeEventListener("pointerup", handlePointerUp);
+        }
+
+        window.addEventListener("pointermove", handlePointerMove);
+        window.addEventListener("pointerup", handlePointerUp);
+    }
+
+    return (
+        <div
+            className="draggableCardElement"
+            onPointerDown={handlePointerDown}
+            style={{
+                left: `${position.x}%`,
+                top: `${position.y}%`,
+                width: `${position.width}%`,
+                height: `${position.height}%`,
+            }}
+        >
+            <div className="draggableContent">
+                {children}
+            </div>
+
+            <span
+                className="resizeHandle"
+                onPointerDown={handleResizePointerDown}
+            />
+        </div>
+    );
+}
+
 export default function VisitenkartenDesignerPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -129,6 +259,60 @@ export default function VisitenkartenDesignerPage() {
     const format = searchParams.get("format") || "85 × 55 mm";
 
     const isDoubleSided = seiten === "Beidseitig bedruckt";
+    const cardRef = useRef<HTMLDivElement | null>(null);
+
+    const [dragPositions, setDragPositions] = useState<Record<DraggableKey, DragPosition>>({
+        logo: {
+            x: 65,
+            y: 35,
+            width: 18,
+            height: 18,
+        },
+        name: {
+            x: 8,
+            y: 12,
+            width: 48,
+            height: 24,
+        },
+        contact: {
+            x: 10,
+            y: 48,
+            width: 45,
+            height: 35,
+        },
+
+        backLogo: {
+            x: 42,
+            y: 25,
+            width: 20,
+            height: 20,
+        },
+        backWebsite: {
+            x: 35,
+            y: 50,
+            width: 30,
+            height: 12,
+        },
+        backLine: {
+            x: 20,
+            y: 67,
+            width: 60,
+            height: 4,
+        },
+    });
+
+    function updateDragPosition(key: DraggableKey, position: DragPosition) {
+        setDragPositions((prev) => ({
+            ...prev,
+            [key]: position,
+        }));
+    }
+
+    function getResponsiveFontSize(base: number, position: DragPosition) {
+        const scale = Math.min(position.width / 45, position.height / 24);
+
+        return Math.max(8, Math.round(base * scale));
+    }
 
     const [activeSide, setActiveSide] = useState<"front" | "back">("front");
 
@@ -150,6 +334,15 @@ export default function VisitenkartenDesignerPage() {
     const [fontSize, setFontSize] = useState(18);
     const [logoUrl, setLogoUrl] = useState("");
 
+    const [frontBackgroundImageUrl, setFrontBackgroundImageUrl] = useState("");
+    const [backBackgroundImageUrl, setBackBackgroundImageUrl] = useState("");
+
+    const [backgroundTargetSide, setBackgroundTargetSide] = useState<"front" | "back">("front");
+    const [showBackgroundPanel, setShowBackgroundPanel] = useState(false);
+
+    const [undoStack, setUndoStack] = useState<any[]>([]); // Rückgängig
+    const [redoStack, setRedoStack] = useState<any[]>([]); // Wiederholen
+
     function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
 
@@ -159,6 +352,31 @@ export default function VisitenkartenDesignerPage() {
 
         reader.onload = () => {
             setLogoUrl(reader.result as string);
+        };
+
+        reader.readAsDataURL(file);
+    }
+    // دالة رفع صورة الخلفية
+    function handleBackgroundUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+            alert("Bitte nur Bilder hochladen.");
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            const imageUrl = reader.result as string;
+
+            if (backgroundTargetSide === "front") {
+                setFrontBackgroundImageUrl(imageUrl);
+            } else {
+                setBackBackgroundImageUrl(imageUrl);
+            }
         };
 
         reader.readAsDataURL(file);
@@ -176,17 +394,23 @@ export default function VisitenkartenDesignerPage() {
             email,
             website,
             address,
+            frontBackgroundImageUrl,
+            backBackgroundImageUrl,
             backgroundColor: customBackgroundColor,
             textColor: customTextColor,
             accentColor: customAccentColor,
             fontSize,
             logoUrl,
             hasBackSide: isDoubleSided,
+            dragPositions,
         };
 
         localStorage.setItem("visitenkartenDesignerData", JSON.stringify(designData));
         router.push("/visitenkarten");
     }
+
+    const currentBackgroundImageUrl =
+        activeSide === "front" ? frontBackgroundImageUrl : backBackgroundImageUrl;
 
     return (
         <main className="designerPage">
@@ -250,6 +474,8 @@ export default function VisitenkartenDesignerPage() {
                                     setCustomBackgroundColor(template.backgroundColor);
                                     setCustomTextColor(template.textColor);
                                     setCustomAccentColor(template.accentColor);
+                                    setFrontBackgroundImageUrl("");
+                                    setBackBackgroundImageUrl(""); //لما تنتقل من قالب فيه صورة لقالب ثاني، ما تضل الصورة القديمة
                                 }}
                             >
                                 <div
@@ -379,9 +605,14 @@ export default function VisitenkartenDesignerPage() {
 
                     <div className="designerWorkSurface">
                         <div
+                            ref={cardRef}
                             className="businessCardPreview"
                             style={{
                                 backgroundColor: customBackgroundColor,
+                                backgroundImage: frontBackgroundImageUrl ? `url(${frontBackgroundImageUrl})` : "none",
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                                backgroundRepeat: "no-repeat",
                                 color: customTextColor,
                                 borderColor: customAccentColor,
                             }}
@@ -393,6 +624,129 @@ export default function VisitenkartenDesignerPage() {
 
                             {activeSide === "front" ? (
                                 <>
+                                    {selectedTemplate.layout === "blank" && (
+                                        <div
+                                            className="cardBlankLayout"
+                                            style={{
+                                                backgroundColor: customBackgroundColor,
+                                                backgroundImage: frontBackgroundImageUrl ? `url(${frontBackgroundImageUrl})` : "none",
+                                                backgroundSize: "cover",
+                                                backgroundPosition: "center",
+                                                backgroundRepeat: "no-repeat",
+                                                color: customTextColor,
+                                            }}
+                                        >
+                                            <DraggableElement
+                                                itemKey="logo"
+                                                position={dragPositions.logo}
+                                                cardRef={cardRef}
+                                                onMove={updateDragPosition}
+                                            >
+                                                <div className="blankLogoBlock">
+                                                    {logoUrl ? (
+                                                        <img
+                                                            src={logoUrl}
+                                                            alt="Logo"
+                                                            className="blankDesignerLogo"
+                                                        />
+                                                    ) : (
+                                                        <div
+                                                            className="blankLogoPlaceholder"
+                                                            style={{
+                                                                borderColor: customAccentColor,
+                                                                color: customAccentColor,
+                                                                fontSize: `${getResponsiveFontSize(18, dragPositions.logo)}px`,
+                                                            }}
+                                                        >
+                                                            LOGO
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </DraggableElement>
+
+                                            <DraggableElement
+                                                itemKey="name"
+                                                position={dragPositions.name}
+                                                cardRef={cardRef}
+                                                onMove={updateDragPosition}
+                                            >
+                                                <div className="blankNameBlock">
+                                                    <h2
+                                                        style={{
+                                                            fontSize: `${getResponsiveFontSize(fontSize + 18, dragPositions.name)}px`,
+                                                            color: customTextColor,
+                                                        }}
+                                                    >
+                                                        {name}
+                                                    </h2>
+
+                                                    <p
+                                                        style={{
+                                                            color: customAccentColor,
+                                                            fontSize: `${getResponsiveFontSize(fontSize + 6, dragPositions.name)}px`,
+                                                        }}
+                                                    >
+                                                        {jobTitle}
+                                                    </p>
+                                                </div>
+                                            </DraggableElement>
+
+                                            <DraggableElement
+                                                itemKey="contact"
+                                                position={dragPositions.contact}
+                                                cardRef={cardRef}
+                                                onMove={updateDragPosition}
+                                            >
+                                                <div
+                                                    className="blankContactList"
+                                                    style={{
+                                                        fontSize: `${getResponsiveFontSize(fontSize + 4, dragPositions.contact)}px`,
+                                                    }}
+                                                >
+                                                  <span className="cardContactItem">
+                                                      <span
+                                                          className="cardContactIcon"
+                                                          style={{ color: customAccentColor }}
+                                                      >
+                                                          <DesignerIcon type="phone" />
+                                                      </span>
+                                                      {phone}
+                                                  </span>
+
+                                                  <span className="cardContactItem">
+                                                      <span
+                                                          className="cardContactIcon"
+                                                          style={{ color: customAccentColor }}
+                                                      >
+                                                          <DesignerIcon type="mail" />
+                                                      </span>
+                                                      {email}
+                                                  </span>
+
+                                                  <span className="cardContactItem">
+                                                      <span
+                                                          className="cardContactIcon"
+                                                          style={{ color: customAccentColor }}
+                                                      >
+                                                          <DesignerIcon type="globe" />
+                                                      </span>
+                                                        {website}
+                                                  </span>
+
+                                                  <span className="cardContactItem">
+                                                      <span
+                                                          className="cardContactIcon"
+                                                          style={{ color: customAccentColor }}
+                                                      >
+                                                          <DesignerIcon type="location" />
+                                                      </span>
+                                                        {address}
+                                                  </span>
+                                                </div>
+                                            </DraggableElement>
+                                        </div>
+                                    )}
+
                                     {selectedTemplate.layout === "classic" && (
                                         <>
                                             <div
@@ -471,6 +825,10 @@ export default function VisitenkartenDesignerPage() {
                                             className="cardDarkGoldLayout"
                                             style={{
                                                 backgroundColor: customBackgroundColor,
+                                                backgroundImage: frontBackgroundImageUrl ? `url(${frontBackgroundImageUrl})` : "none",
+                                                backgroundSize: "cover",
+                                                backgroundPosition: "center",
+                                                backgroundRepeat: "no-repeat",
                                                 color: customTextColor,
                                             }}
                                         >
@@ -543,6 +901,10 @@ export default function VisitenkartenDesignerPage() {
                                             className="cardBlueLayout"
                                             style={{
                                                 backgroundColor: customBackgroundColor,
+                                                backgroundImage: frontBackgroundImageUrl ? `url(${frontBackgroundImageUrl})` : "none",
+                                                backgroundSize: "cover",
+                                                backgroundPosition: "center",
+                                                backgroundRepeat: "no-repeat",
                                                 color: customTextColor,
                                             }}
                                         >
@@ -611,6 +973,10 @@ export default function VisitenkartenDesignerPage() {
                                             className="cardGreenLayout"
                                             style={{
                                                 backgroundColor: customBackgroundColor,
+                                                backgroundImage: frontBackgroundImageUrl ? `url(${frontBackgroundImageUrl})` : "none",
+                                                backgroundSize: "cover",
+                                                backgroundPosition: "center",
+                                                backgroundRepeat: "no-repeat",
                                                 color: customTextColor,
                                             }}
                                         >
@@ -697,23 +1063,75 @@ export default function VisitenkartenDesignerPage() {
                                     )}
                                 </>
                             ) : (
-                                <div className="cardBackContent">
-                                    {logoUrl ? (
-                                        <img
-                                            src={logoUrl}
-                                            alt="Logo"
-                                            className="designerLogoBack"
+                                <div
+                                    className="cardBackContentEditable"
+                                    style={{
+                                        backgroundColor: customBackgroundColor,
+                                        backgroundImage: backBackgroundImageUrl ? `url(${backBackgroundImageUrl})` : "none",
+                                        backgroundSize: "cover",
+                                        backgroundPosition: "center",
+                                        backgroundRepeat: "no-repeat",
+                                        color: customTextColor,
+                                    }}
+                                >
+                                    <DraggableElement
+                                        itemKey="backLogo"
+                                        position={dragPositions.backLogo}
+                                        cardRef={cardRef}
+                                        onMove={updateDragPosition}
+                                    >
+                                        <div className="backLogoBlock">
+                                            {logoUrl ? (
+                                                <img
+                                                    src={logoUrl}
+                                                    alt="Logo"
+                                                    className="blankDesignerLogo"
+                                                />
+                                            ) : (
+                                                <div
+                                                    className="blankLogoPlaceholder"
+                                                    style={{
+                                                        borderColor: customAccentColor,
+                                                        color: customAccentColor,
+                                                        fontSize: `${getResponsiveFontSize(18, dragPositions.backLogo)}px`,
+                                                    }}
+                                                >
+                                                    LOGO
+                                                </div>
+                                            )}
+                                        </div>
+                                    </DraggableElement>
+
+                                    <DraggableElement
+                                        itemKey="backWebsite"
+                                        position={dragPositions.backWebsite}
+                                        cardRef={cardRef}
+                                        onMove={updateDragPosition}
+                                    >
+                                        <p
+                                            className="backWebsiteText"
+                                            style={{
+                                                color: customTextColor,
+                                                fontSize: `${getResponsiveFontSize(fontSize + 4, dragPositions.backWebsite)}px`,
+                                            }}
+                                        >
+                                            {website}
+                                        </p>
+                                    </DraggableElement>
+
+                                    <DraggableElement
+                                        itemKey="backLine"
+                                        position={dragPositions.backLine}
+                                        cardRef={cardRef}
+                                        onMove={updateDragPosition}
+                                    >
+                                        <div
+                                            className="cardBackLineEditable"
+                                            style={{
+                                                backgroundColor: customAccentColor,
+                                            }}
                                         />
-                                    ) : (
-                                        <h2>LOGO</h2>
-                                    )}
-
-                                    <p>{website}</p>
-
-                                    <div
-                                        className="cardBackLine"
-                                        style={{ backgroundColor: customAccentColor }}
-                                    />
+                                    </DraggableElement>
                                 </div>
                             )}
                         </div>
@@ -755,52 +1173,127 @@ export default function VisitenkartenDesignerPage() {
                     <h3>Schnellaktionen</h3>
 
                     <div className="designerQuickActions">
-                        <button type="button">Hintergrund ändern</button>
+                        <button
+                            type="button"
+                            onClick={() => setShowBackgroundPanel(!showBackgroundPanel)}
+                        >
+                            Hintergrund ändern
+                        </button>
+
+                        {showBackgroundPanel && (
+                            <div className="designerBackgroundPanel">
+                                <h4>Hintergrundbild</h4>
+
+                                <div className="designerBackgroundTarget">
+                                    <button
+                                        type="button"
+                                        className={backgroundTargetSide === "front" ? "activeBackgroundTarget" : ""}
+                                        onClick={() => setBackgroundTargetSide("front")}
+                                    >
+                                        Vorderseite
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        className={backgroundTargetSide === "back" ? "activeBackgroundTarget" : ""}
+                                        onClick={() => setBackgroundTargetSide("back")}
+                                    >
+                                        Rückseite
+                                    </button>
+                                </div>
+
+                                <input
+                                    type="file"
+                                    accept="image/png,image/jpeg,image/jpg"
+                                    onChange={handleBackgroundUpload}
+                                />
+
+                                {backgroundTargetSide === "front" && frontBackgroundImageUrl && (
+                                    <>
+                                        <button
+                                            type="button"
+                                            onClick={() => setFrontBackgroundImageUrl("")}
+                                            className="designerRemoveBackgroundButton"
+                                        >
+                                            Vorderseite Hintergrund entfernen
+                                        </button>
+
+                                        <div
+                                            className="designerBackgroundPreview"
+                                            style={{
+                                                backgroundImage: `url(${frontBackgroundImageUrl})`,
+                                            }}
+                                        />
+                                    </>
+                                )}
+
+                                {backgroundTargetSide === "back" && backBackgroundImageUrl && (
+                                    <>
+                                        <button
+                                            type="button"
+                                            onClick={() => setBackBackgroundImageUrl("")}
+                                            className="designerRemoveBackgroundButton"
+                                        >
+                                            Rückseite Hintergrund entfernen
+                                        </button>
+
+                                        <div
+                                            className="designerBackgroundPreview"
+                                            style={{
+                                                backgroundImage: `url(${backBackgroundImageUrl})`,
+                                            }}
+                                        />
+                                    </>
+                                )}
+                            </div>
+                        )}
+
                         <button
                             type="button"
                             onClick={() => setShowColorPanel(!showColorPanel)}
                         >
                             Farben anpassen
                         </button>
+
+                        {showColorPanel && (
+                            <div className="designerColorPanel">
+                                <h4>Farben anpassen</h4>
+
+                                <div className="designerColorRow">
+                                    <label>Hintergrund</label>
+                                    <input
+                                        type="color"
+                                        value={customBackgroundColor}
+                                        onChange={(e) => setCustomBackgroundColor(e.target.value)}
+                                    />
+                                    <span>{customBackgroundColor}</span>
+                                </div>
+
+                                <div className="designerColorRow">
+                                    <label>Textfarbe</label>
+                                    <input
+                                        type="color"
+                                        value={customTextColor}
+                                        onChange={(e) => setCustomTextColor(e.target.value)}
+                                    />
+                                    <span>{customTextColor}</span>
+                                </div>
+
+                                <div className="designerColorRow">
+                                    <label>Akzentfarbe</label>
+                                    <input
+                                        type="color"
+                                        value={customAccentColor}
+                                        onChange={(e) => setCustomAccentColor(e.target.value)}
+                                    />
+                                    <span>{customAccentColor}</span>
+                                </div>
+                            </div>
+                        )}
+
                         <button type="button">Element hinzufügen</button>
                         <button type="button">Ausrichten ›</button>
                     </div>
-
-                    {showColorPanel && (
-                        <div className="designerColorPanel">
-                            <h4>Farben anpassen</h4>
-
-                            <div className="designerColorRow">
-                                <label>Hintergrund</label>
-                                <input
-                                    type="color"
-                                    value={customBackgroundColor}
-                                    onChange={(e) => setCustomBackgroundColor(e.target.value)}
-                                />
-                                <span>{customBackgroundColor}</span>
-                            </div>
-
-                            <div className="designerColorRow">
-                                <label>Textfarbe</label>
-                                <input
-                                    type="color"
-                                    value={customTextColor}
-                                    onChange={(e) => setCustomTextColor(e.target.value)}
-                                />
-                                <span>{customTextColor}</span>
-                            </div>
-
-                            <div className="designerColorRow">
-                                <label>Akzentfarbe</label>
-                                <input
-                                    type="color"
-                                    value={customAccentColor}
-                                    onChange={(e) => setCustomAccentColor(e.target.value)}
-                                />
-                                <span>{customAccentColor}</span>
-                            </div>
-                        </div>
-                    )}
 
                     <h3>Ebenen</h3>
 

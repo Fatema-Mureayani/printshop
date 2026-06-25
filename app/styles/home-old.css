@@ -1,0 +1,139 @@
+.topHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    background-color: #000;
+    border-bottom: 1px solid #d4af37;
+}
+
+.logoArea {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logoImg {
+    height: 65px;
+    width: auto;
+}
+
+.logoText h1 {
+    font-size: 26px;
+    color: #d4af37;
+}
+
+.logoText p {
+    font-size: 14px;
+    color: #aaa;
+}
+
+.companyName {
+    font-size: 28px;
+    color: #d4af37; /* ذهبي */
+}
+
+.companySubtext {
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+.headerActions {
+    display: flex;
+    gap: 30px;
+}
+
+.headerItem {
+    font-size: 18px;
+    color: #fff;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.headerItem:hover {
+    color: #d4af37;
+}
+
+.mainNav {
+    display: flex;
+    gap: 32px;
+    background-color: #000000;
+    color: #ffffff;
+    padding: 16px 40px;
+    border-bottom: 1px solid #d4af37;
+}
+
+.navLink {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.navLink:hover {
+    color: #d4af37;
+}
+
+.heroSection {
+    background: #000000; /* أسود */
+    padding: 60px 40px;
+    border-bottom: 1px solid #d4af37;
+}
+
+.heroText h2 {
+    font-size: 36px;
+    margin-bottom: 12px;
+    color: #d4af37; /* ذهبي */
+}
+
+.heroText p {
+    font-size: 18px;
+    color: #ffffff; /* أبيض */
+}
+
+.section {
+    padding: 40px;
+}
+
+.sectionTitle {
+    font-size: 30px;
+    margin-bottom: 24px;
+    color: #d4af37;
+}
+
+.productsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+}
+
+.productCard {
+    background-color: #111111;
+    border: 1px solid #d4af37;
+    border-radius: 14px;
+    padding: 20px;
+}
+
+.productCard h3 {
+    font-size: 24px;
+    margin-bottom: 12px;
+    color: #d4af37;
+}
+
+/*.productCard p {*/
+/*  color: #4b5563;*/
+/*  margin-bottom: 16px;*/
+/*  line-height: 1.5;*/
+/*}*/
+
+.productCard strong {
+    color: #ffffff;
+    font-size: 20px;
+}
+
+.infoBox {
+    background-color: #ffffff;
+    border: 1px solid #d4af37;
+    border-radius: 14px;
+    padding: 24px;
+    line-height: 1.8;
+    color: #000000; /* 👈 هذا المهم */
+}
