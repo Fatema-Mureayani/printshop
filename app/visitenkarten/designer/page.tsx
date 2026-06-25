@@ -131,7 +131,7 @@ function DesignerIcon({ type }: { type: string }) {
 }
 
 /*  كود Drag & Drop */
-type DraggableKey = "logo" | "name" | "contact"| "backLogo" | "backWebsite" | "backLine";
+type DraggableKey = string;
 
 type DragPosition = {
     x: number;
@@ -140,19 +140,61 @@ type DragPosition = {
     height: number;
 };
 
+type DesignerElement = {
+    id: string;
+    type: "text" | "logo" | "contact" | "line" | "emoji";
+    side: "front" | "back";
+    position: DragPosition;
+    content?: string;
+    color?: string;
+    fontSize?: number;
+};
+
+type DesignerState = {
+    dragPositions: Record<DraggableKey, DragPosition>;
+    name: string;
+    jobTitle: string;
+    phone: string;
+    email: string;
+    website: string;
+    address: string;
+    customBackgroundColor: string;
+    customTextColor: string;
+    customAccentColor: string;
+    logoUrl: string;
+    frontBackgroundImageUrl: string;
+    backBackgroundImageUrl: string;
+    fontSize: number;
+    elements: DesignerElement[];
+};
+
+type CustomText = {
+    id: number;
+    text: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    fontSize: number;
+    color: string;
+};
+
 type DraggableElementProps = {
     itemKey: DraggableKey;
     position: DragPosition;
     cardRef: React.RefObject<HTMLDivElement | null>;
     onMove: (key: DraggableKey, position: DragPosition) => void;
+    onHistoryStart: () => void;
     children: ReactNode;
 };
 
+//استقبال الـ Props
 function DraggableElement({
                               itemKey,
                               position,
                               cardRef,
                               onMove,
+                              onHistoryStart,
                               children,
                           }: DraggableElementProps) {
     function handlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
@@ -162,6 +204,7 @@ function DraggableElement({
         const element = e.currentTarget;
 
         if (!card) return;
+        onHistoryStart();
 
         const cardRect = card.getBoundingClientRect();
         const elementRect = element.getBoundingClientRect();
@@ -202,6 +245,7 @@ function DraggableElement({
         const card = cardRef.current;
 
         if (!card) return;
+        onHistoryStart();
 
         const cardRect = card.getBoundingClientRect();
 
@@ -261,6 +305,8 @@ export default function VisitenkartenDesignerPage() {
     const isDoubleSided = seiten === "Beidseitig bedruckt";
     const cardRef = useRef<HTMLDivElement | null>(null);
 
+    const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
+
     const [dragPositions, setDragPositions] = useState<Record<DraggableKey, DragPosition>>({
         logo: {
             x: 65,
@@ -301,11 +347,24 @@ export default function VisitenkartenDesignerPage() {
         },
     });
 
+    const [elements, setElements] = useState<DesignerElement[]>([]);
+
     function updateDragPosition(key: DraggableKey, position: DragPosition) {
         setDragPositions((prev) => ({
             ...prev,
             [key]: position,
         }));
+    }
+
+    // دالة تحريك العناصر الجديدة
+    function updateElementPosition(id: string, position: DragPosition) {
+        setElements((prev) =>
+            prev.map((element) =>
+                element.id === id
+                    ? { ...element, position }
+                    : element
+            )
+        );
     }
 
     function getResponsiveFontSize(base: number, position: DragPosition) {
@@ -330,9 +389,16 @@ export default function VisitenkartenDesignerPage() {
     const [customAccentColor, setCustomAccentColor] = useState(templates[0].accentColor);
 
     const [showColorPanel, setShowColorPanel] = useState(false);
+    const [showElementPanel, setShowElementPanel] = useState(false);
 
     const [fontSize, setFontSize] = useState(18);
     const [logoUrl, setLogoUrl] = useState("");
+
+    const [customTexts, setCustomTexts] = useState<CustomText[]>([]);
+
+    const [undoStack, setUndoStack] = useState<DesignerState[]>([]); // Rückgängig
+    const [redoStack, setRedoStack] = useState<DesignerState[]>([]); // Wiederholen
+    const [zoom, setZoom] = useState(100);
 
     const [frontBackgroundImageUrl, setFrontBackgroundImageUrl] = useState("");
     const [backBackgroundImageUrl, setBackBackgroundImageUrl] = useState("");
@@ -340,8 +406,80 @@ export default function VisitenkartenDesignerPage() {
     const [backgroundTargetSide, setBackgroundTargetSide] = useState<"front" | "back">("front");
     const [showBackgroundPanel, setShowBackgroundPanel] = useState(false);
 
-    const [undoStack, setUndoStack] = useState<any[]>([]); // Rückgängig
-    const [redoStack, setRedoStack] = useState<any[]>([]); // Wiederholen
+    const [editingElementId, setEditingElementId] = useState<string | null>(null);
+
+    function getCurrentDesignerState(): DesignerState {
+        return {
+            dragPositions,
+            name,
+            jobTitle,
+            phone,
+            email,
+            website,
+            address,
+            customBackgroundColor,
+            customTextColor,
+            customAccentColor,
+            logoUrl,
+            frontBackgroundImageUrl,
+            backBackgroundImageUrl,
+            fontSize,
+            elements,
+        };
+    }
+
+    function applyDesignerState(state: DesignerState) {
+        setDragPositions(state.dragPositions);
+        setName(state.name);
+        setJobTitle(state.jobTitle);
+        setPhone(state.phone);
+        setEmail(state.email);
+        setWebsite(state.website);
+        setAddress(state.address);
+        setCustomBackgroundColor(state.customBackgroundColor);
+        setCustomTextColor(state.customTextColor);
+        setCustomAccentColor(state.customAccentColor);
+        setLogoUrl(state.logoUrl);
+        setFrontBackgroundImageUrl(state.frontBackgroundImageUrl);
+        setBackBackgroundImageUrl(state.backBackgroundImageUrl);
+        setFontSize(state.fontSize);
+        setElements(state.elements);
+    }
+
+    function saveHistory() {
+        setUndoStack((prev) => [...prev, getCurrentDesignerState()]);
+        setRedoStack([]);
+    }
+
+    function undo() {
+        if (undoStack.length === 0) return;
+
+        const previousState = undoStack[undoStack.length - 1];
+
+        setRedoStack((prev) => [...prev, getCurrentDesignerState()]);
+        setUndoStack((prev) => prev.slice(0, -1));
+
+        applyDesignerState(previousState);
+    }
+
+    function redo() {
+        if (redoStack.length === 0) return;
+
+        const nextState = redoStack[redoStack.length - 1];
+
+        setUndoStack((prev) => [...prev, getCurrentDesignerState()]);
+        setRedoStack((prev) => prev.slice(0, -1));
+
+        applyDesignerState(nextState);
+    }
+
+    function zoomOut() {
+        setZoom((prev) => Math.max(50, prev - 10));
+    }
+
+    function zoomIn() {
+        setZoom((prev) => Math.min(200, prev + 10));
+    }
 
     function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
@@ -380,6 +518,38 @@ export default function VisitenkartenDesignerPage() {
         };
 
         reader.readAsDataURL(file);
+    }
+
+    function deleteElement(id: string) {
+        saveHistory();
+
+        setElements((prev) => prev.filter((element) => element.id !== id));
+
+        if (selectedElementId === id) {
+            setSelectedElementId(null);
+        }
+    }
+
+    // دالة Text hinzufügen
+    function addTextElement() {
+        saveHistory();
+
+        const newElement: DesignerElement = {
+            id: crypto.randomUUID(),
+            type: "text",
+            side: activeSide,
+            content: "Neuer Text",
+            color: customTextColor,
+            fontSize: 22,
+            position: {
+                x: 30,
+                y: 30,
+                width: 25,
+                height: 12,
+            },
+        };
+
+        setElements((prev) => [...prev, newElement]);
     }
 
     function finishDesign() {
@@ -429,17 +599,21 @@ export default function VisitenkartenDesignerPage() {
                 </div>
 
                 <div className="designerTopCenter">
-                    <button type="button">↶</button>
+                    <button type="button" onClick={undo} disabled={undoStack.length === 0}>
+                        ↶
+                    </button>
                     <span>Rückgängig</span>
-                    <button type="button">↷</button>
+                    <button type="button" onClick={redo} disabled={redoStack.length === 0}>
+                        ↷
+                    </button>
                     <span>Wiederholen</span>
                 </div>
 
                 <div className="designerTopRight">
                     <div className="designerZoom">
-                        <button type="button">−</button>
-                        <span>100%</span>
-                        <button type="button">+</button>
+                        <button type="button" onClick={zoomOut}>−</button>
+                        <span>{zoom}%</span>
+                        <button type="button" onClick={zoomIn}>+</button>
                     </div>
 
                     <button
@@ -514,7 +688,11 @@ export default function VisitenkartenDesignerPage() {
                         </span>
                         <div>
                             <label>Name</label>
-                            <input value={name} onChange={(e) => setName(e.target.value)} />
+                            <input
+                                value={name}
+                                onFocus={saveHistory}
+                                onChange={(e) => setName(e.target.value)}
+                            />
                         </div>
                     </div>
 
@@ -524,7 +702,10 @@ export default function VisitenkartenDesignerPage() {
                         </span>
                         <div>
                             <label>Position / Beruf</label>
-                            <input value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} />
+                            <input value={jobTitle}
+                                   onFocus={saveHistory}
+                                   onChange={(e) => setJobTitle(e.target.value)}
+                            />
                         </div>
                     </div>
 
@@ -534,7 +715,10 @@ export default function VisitenkartenDesignerPage() {
                         </span>
                         <div>
                             <label>Telefon</label>
-                            <input value={phone} onChange={(e) => setPhone(e.target.value)} />
+                            <input value={phone}
+                                   onFocus={saveHistory}
+                                   onChange={(e) => setPhone(e.target.value)}
+                            />
                         </div>
                     </div>
 
@@ -544,7 +728,10 @@ export default function VisitenkartenDesignerPage() {
                         </span>
                         <div>
                             <label>E-Mail</label>
-                            <input value={email} onChange={(e) => setEmail(e.target.value)} />
+                            <input value={email}
+                                   onFocus={saveHistory}
+                                   onChange={(e) => setEmail(e.target.value)}
+                            />
                         </div>
                     </div>
 
@@ -554,7 +741,10 @@ export default function VisitenkartenDesignerPage() {
                         </span>
                         <div>
                             <label>Webseite</label>
-                            <input value={website} onChange={(e) => setWebsite(e.target.value)} />
+                            <input value={website}
+                                   onFocus={saveHistory}
+                                   onChange={(e) => setWebsite(e.target.value)}
+                            />
                         </div>
                     </div>
 
@@ -564,7 +754,10 @@ export default function VisitenkartenDesignerPage() {
                         </span>
                         <div>
                             <label>Adresse</label>
-                            <input value={address} onChange={(e) => setAddress(e.target.value)} />
+                            <input value={address}
+                                   onFocus={saveHistory}
+                                   onChange={(e) => setAddress(e.target.value)}
+                            />
                         </div>
                     </div>
 
@@ -603,7 +796,13 @@ export default function VisitenkartenDesignerPage() {
                 <section className="designerCanvasArea">
                     <div className="designerFormatBadge">{format}</div>
 
-                    <div className="designerWorkSurface">
+                    <div
+                        className="designerWorkSurface"
+                        style={{
+                            transform: `scale(${zoom / 100})`,
+                            transformOrigin: "center center",
+                        }}
+                    >
                         <div
                             ref={cardRef}
                             className="businessCardPreview"
@@ -636,11 +835,51 @@ export default function VisitenkartenDesignerPage() {
                                                 color: customTextColor,
                                             }}
                                         >
+                                            {customTexts.map((item) => (
+                                                <DraggableElement
+                                                    key={item.id}
+                                                    itemKey="name"
+                                                    position={{
+                                                        x: item.x,
+                                                        y: item.y,
+                                                        width: item.width,
+                                                        height: item.height,
+                                                    }}
+                                                    cardRef={cardRef}
+                                                    onMove={(key, position) => {
+                                                        setCustomTexts((prev) =>
+                                                            prev.map((t) =>
+                                                                t.id === item.id
+                                                                    ? {
+                                                                        ...t,
+                                                                        x: position.x,
+                                                                        y: position.y,
+                                                                        width: position.width,
+                                                                        height: position.height,
+                                                                    }
+                                                                    : t
+                                                            )
+                                                        );
+                                                    }}
+                                                    onHistoryStart={saveHistory}
+                                                >
+                                                    <div
+                                                        style={{
+                                                            fontSize: item.fontSize,
+                                                            color: item.color,
+                                                            fontWeight: 600,
+                                                        }}
+                                                    >
+                                                        {item.text}
+                                                    </div>
+                                                </DraggableElement>
+                                            ))}
                                             <DraggableElement
                                                 itemKey="logo"
                                                 position={dragPositions.logo}
                                                 cardRef={cardRef}
                                                 onMove={updateDragPosition}
+                                                onHistoryStart={saveHistory}
                                             >
                                                 <div className="blankLogoBlock">
                                                     {logoUrl ? (
@@ -669,6 +908,7 @@ export default function VisitenkartenDesignerPage() {
                                                 position={dragPositions.name}
                                                 cardRef={cardRef}
                                                 onMove={updateDragPosition}
+                                                onHistoryStart={saveHistory}
                                             >
                                                 <div className="blankNameBlock">
                                                     <h2
@@ -696,6 +936,7 @@ export default function VisitenkartenDesignerPage() {
                                                 position={dragPositions.contact}
                                                 cardRef={cardRef}
                                                 onMove={updateDragPosition}
+                                                onHistoryStart={saveHistory}
                                             >
                                                 <div
                                                     className="blankContactList"
@@ -744,6 +985,83 @@ export default function VisitenkartenDesignerPage() {
                                                   </span>
                                                 </div>
                                             </DraggableElement>
+
+                                            {elements
+                                                .filter((element) => element.side === activeSide)
+                                                .map((element) => (
+                                                    <DraggableElement
+                                                        key={element.id}
+                                                        itemKey={element.id}
+                                                        position={element.position}
+                                                        cardRef={cardRef}
+                                                        onMove={updateElementPosition}
+                                                        onHistoryStart={saveHistory}
+                                                    >
+                                                        <div
+                                                            className={
+                                                                selectedElementId === element.id
+                                                                    ? "customElementWrapper customElementSelected"
+                                                                    : "customElementWrapper"
+                                                            }
+                                                            onPointerDown={() => {
+                                                                setSelectedElementId(element.id);
+                                                            }}
+                                                        >
+                                                            {selectedElementId === element.id && (
+                                                                <button
+                                                                    type="button"
+                                                                    className="customElementDeleteButton"
+                                                                    onPointerDown={(e) => e.stopPropagation()}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        deleteElement(element.id);
+                                                                    }}
+                                                                >
+                                                                    ×
+                                                                </button>
+                                                            )}
+
+                                                            {element.type === "text" && (
+                                                                <div
+                                                                    className="customDesignerText"
+                                                                    contentEditable={editingElementId === element.id}
+                                                                    suppressContentEditableWarning
+                                                                    onDoubleClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setEditingElementId(element.id);
+                                                                    }}
+                                                                    onPointerDown={(e) => {
+                                                                        if (editingElementId === element.id) {
+                                                                            e.stopPropagation();
+                                                                        }
+                                                                    }}
+                                                                    onBlur={(e) => {
+                                                                        const newText = e.currentTarget.innerText;
+
+                                                                        saveHistory();
+
+                                                                        setElements((prev) =>
+                                                                            prev.map((item) =>
+                                                                                item.id === element.id
+                                                                                    ? { ...item, content: newText }
+                                                                                    : item
+                                                                            )
+                                                                        );
+
+                                                                        setEditingElementId(null);
+                                                                    }}
+                                                                    style={{
+                                                                        color: element.color,
+                                                                        fontSize: `${element.fontSize}px`,
+                                                                        cursor: editingElementId === element.id ? "text" : "move",
+                                                                    }}
+                                                                >
+                                                                    {element.content}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </DraggableElement>
+                                                ))}
                                         </div>
                                     )}
 
@@ -1079,6 +1397,7 @@ export default function VisitenkartenDesignerPage() {
                                         position={dragPositions.backLogo}
                                         cardRef={cardRef}
                                         onMove={updateDragPosition}
+                                        onHistoryStart={saveHistory}
                                     >
                                         <div className="backLogoBlock">
                                             {logoUrl ? (
@@ -1107,6 +1426,7 @@ export default function VisitenkartenDesignerPage() {
                                         position={dragPositions.backWebsite}
                                         cardRef={cardRef}
                                         onMove={updateDragPosition}
+                                        onHistoryStart={saveHistory}
                                     >
                                         <p
                                             className="backWebsiteText"
@@ -1124,6 +1444,7 @@ export default function VisitenkartenDesignerPage() {
                                         position={dragPositions.backLine}
                                         cardRef={cardRef}
                                         onMove={updateDragPosition}
+                                        onHistoryStart={saveHistory}
                                     >
                                         <div
                                             className="cardBackLineEditable"
@@ -1291,18 +1612,36 @@ export default function VisitenkartenDesignerPage() {
                             </div>
                         )}
 
-                        <button type="button">Element hinzufügen</button>
+                        <button
+                            type="button"
+                            onClick={() => setShowElementPanel(!showElementPanel)}
+                        >
+                            Element hinzufügen
+                        </button>
+
+                        {showElementPanel && (
+                            <div className="designerElementPanel">
+                                <h4>Element hinzufügen</h4>
+
+                                <button type="button" onClick={addTextElement}>
+                                    Text hinzufügen
+                                </button>
+
+                                <button type="button">
+                                    Emoji hinzufügen
+                                </button>
+
+                                <button type="button">
+                                    Linie hinzufügen
+                                </button>
+
+                                <button type="button">
+                                    Rechteck hinzufügen
+                                </button>
+                            </div>
+                        )}
+
                         <button type="button">Ausrichten ›</button>
-                    </div>
-
-                    <h3>Ebenen</h3>
-
-                    <div className="designerLayers">
-                        <div> T&nbsp; {name} <span>👁</span></div>
-                        <div> T&nbsp; {jobTitle} <span>👁</span></div>
-                        <div>▤ Kontaktinformationen <span>👁</span></div>
-                        <div>▧ Logo <span>👁</span></div>
-                        <div>■ Hintergrund <span>🔒</span></div>
                     </div>
 
                     <div className="designerTipBox">

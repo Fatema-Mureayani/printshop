@@ -837,26 +837,6 @@
     text-align: left;
 }
 
-.designerLayers {
-    display: flex;
-    flex-direction: column;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.designerLayers div {
-    padding: 12px;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-}
-
-.designerLayers div:last-child {
-    border-bottom: none;
-}
-
 .designerTipBox {
     margin-top: 26px;
     background: #fff8e6;
@@ -979,11 +959,9 @@
     user-select: none;
     touch-action: none;
     z-index: 5;
-}
-
-.draggableCardElement:hover {
-    outline: 2px dashed rgba(96, 165, 250, 0.8);
-    outline-offset: 4px;
+    outline: 2px dashed rgba(96, 165, 250, 0.9);
+    outline-offset: 2px;
+    box-sizing: border-box;
 }
 
 .cardBlankLayout {
@@ -1039,20 +1017,19 @@
 .draggableContent {
     width: 100%;
     height: 100%;
-    overflow: visible;
 }
 
 .resizeHandle {
     position: absolute;
     right: -7px;
     bottom: -7px;
-    width: 14px;
-    height: 14px;
-    background: white;
+    width: 12px;
+    height: 12px;
     border: 3px solid #60a5fa;
-    border-radius: 3px;
+    border-radius: 4px;
+    background: #ffffff;
     cursor: nwse-resize;
-    z-index: 10;
+    z-index: 20;
 }
 
 .resizeHandle::before {
@@ -1110,6 +1087,104 @@
     width: 100%;
     height: 100%;
     border-radius: 999px;
+}
+
+.designerElementPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #ffffff;
+}
+
+.designerElementPanel h4 {
+    margin: 0 0 6px;
+    font-size: 16px;
+}
+
+.designerElementPanel button {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #f9fafb;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+}
+
+.designerElementPanel button:hover {
+    background: #f3f4f6;
+}
+
+.customDesignerText {
+    width: 100%;
+    height: 100%;
+    outline: none;
+    font-weight: 600;
+    line-height: 1.15;
+    word-break: break-word;
+    user-select: none;
+}
+
+.customDesignerText[contenteditable="true"] {
+    user-select: text;
+    cursor: text;
+}
+
+.customElementWrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.customElementWrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.customElementSelected {
+    outline: none;
+}
+
+.customElementDeleteButton {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 999px;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+    cursor: pointer;
+    z-index: 30;
+}
+
+.customDesignerText {
+    width: 100%;
+    height: 100%;
+    outline: none;
+    cursor: move;
+    font-weight: 600;
+    line-height: 1.15;
+    word-break: break-word;
+}
+
+.customDesignerText {
+    width: 100%;
+    height: 100%;
+    outline: none;
+    cursor: text;
+    font-weight: 600;
+    line-height: 1.15;
+    word-break: break-word;
 }
 
 /* Responsive */
