@@ -142,11 +142,12 @@ type DragPosition = {
 
 type DesignerElement = {
     id: string;
-    type: "text" | "logo" | "contact" | "line" | "emoji";
+    type: "text" | "emoji" | "line" | "rect" | "circle" ;
     side: "front" | "back";
     position: DragPosition;
     content?: string;
     color?: string;
+    backgroundColor?: string;
     fontSize?: number;
 };
 
@@ -530,26 +531,55 @@ export default function VisitenkartenDesignerPage() {
         }
     }
 
-    // دالة Text hinzufügen
-    function addTextElement() {
+    // دالة عامة للإضافة
+    function addElement(type: DesignerElement["type"]) {
         saveHistory();
 
-        const newElement: DesignerElement = {
+        const baseElement: DesignerElement = {
             id: crypto.randomUUID(),
-            type: "text",
+            type,
             side: activeSide,
-            content: "Neuer Text",
-            color: customTextColor,
-            fontSize: 22,
             position: {
                 x: 30,
                 y: 30,
                 width: 25,
                 height: 12,
             },
+            color: customTextColor,
+            backgroundColor: customAccentColor,
+            fontSize: 24,
         };
 
-        setElements((prev) => [...prev, newElement]);
+        if (type === "text") {
+            baseElement.content = "Neuer Text";
+        }
+
+        if (type === "emoji") {
+            baseElement.content = "😀";
+            baseElement.fontSize = 34;
+            baseElement.position = { x: 40, y: 35, width: 10, height: 12 };
+        }
+
+        if (type === "line") {
+            baseElement.position = { x: 25, y: 50, width: 40, height: 2 };
+        }
+
+        if (type === "rect") {
+            baseElement.position = { x: 35, y: 35, width: 25, height: 18 };
+            baseElement.backgroundColor = customAccentColor;
+        }
+
+        if (type === "circle") {
+            baseElement.position = { x: 40, y: 30, width: 18, height: 18 };
+            baseElement.backgroundColor = customAccentColor;
+        }
+
+        setElements((prev) => [...prev, baseElement]);
+    }
+
+    // دالة Text hinzufügen
+    function addTextElement() {
+        addElement("text");
     }
 
     function finishDesign() {
@@ -577,6 +607,141 @@ export default function VisitenkartenDesignerPage() {
 
         localStorage.setItem("visitenkartenDesignerData", JSON.stringify(designData));
         router.push("/visitenkarten");
+    }
+
+    function renderCustomElements() {
+        return elements
+            .filter((element) => element.side === activeSide)
+            .map((element) => (
+                <DraggableElement
+                    key={element.id}
+                    itemKey={element.id}
+                    position={element.position}
+                    cardRef={cardRef}
+                    onMove={updateElementPosition}
+                    onHistoryStart={saveHistory}
+                >
+                    <div
+                        className={
+                            selectedElementId === element.id
+                                ? "customElementWrapper customElementSelected"
+                                : "customElementWrapper"
+                        }
+                        onPointerDown={() => setSelectedElementId(element.id)}
+                    >
+                        {selectedElementId === element.id && (
+                            <button
+                                type="button"
+                                className="customElementDeleteButton"
+                                onPointerDown={(e) => e.stopPropagation()}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    deleteElement(element.id);
+                                }}
+                            >
+                                ×
+                            </button>
+                        )}
+
+                        {element.type === "text" && (
+                            <div
+                                className="customDesignerText"
+                                contentEditable={editingElementId === element.id}
+                                suppressContentEditableWarning
+                                onDoubleClick={(e) => {
+                                    e.stopPropagation();
+                                    setEditingElementId(element.id);
+                                }}
+                                onPointerDown={(e) => {
+                                    if (editingElementId === element.id) {
+                                        e.stopPropagation();
+                                    }
+                                }}
+                                onBlur={(e) => {
+                                    const newContent = e.currentTarget.innerText;
+
+                                    saveHistory();
+
+                                    setElements((prev) =>
+                                        prev.map((item) =>
+                                            item.id === element.id
+                                                ? { ...item, content: newContent }
+                                                : item
+                                        )
+                                    );
+
+                                    setEditingElementId(null);
+                                }}
+                                style={{
+                                    color: element.color,
+                                    fontSize: `${element.fontSize}px`,
+                                    cursor: editingElementId === element.id ? "text" : "move",
+                                }}
+                            >
+                                {element.content}
+                            </div>
+                        )}
+
+                        {element.type === "emoji" && (
+                            <div
+                                className="customDesignerEmoji"
+                                contentEditable={editingElementId === element.id}
+                                suppressContentEditableWarning
+                                onDoubleClick={(e) => {
+                                    e.stopPropagation();
+                                    setEditingElementId(element.id);
+                                }}
+                                onPointerDown={(e) => {
+                                    if (editingElementId === element.id) {
+                                        e.stopPropagation();
+                                    }
+                                }}
+                                onBlur={(e) => {
+                                    const newContent = e.currentTarget.innerText;
+
+                                    saveHistory();
+
+                                    setElements((prev) =>
+                                        prev.map((item) =>
+                                            item.id === element.id
+                                                ? { ...item, content: newContent }
+                                                : item
+                                        )
+                                    );
+
+                                    setEditingElementId(null);
+                                }}
+                                style={{
+                                    fontSize: `${element.fontSize}px`,
+                                }}
+                            >
+                                {element.content}
+                            </div>
+                        )}
+
+                        {element.type === "line" && (
+                            <div
+                                className="customDesignerLine"
+                                style={{ backgroundColor: element.backgroundColor }}
+                            />
+                        )}
+
+                        {element.type === "rect" && (
+                            <div
+                                className="customDesignerRect"
+                                style={{ backgroundColor: element.backgroundColor }}
+                            />
+                        )}
+
+                        {element.type === "circle" && (
+                            <div
+                                className="customDesignerCircle"
+                                style={{ backgroundColor: element.backgroundColor }}
+                            />
+                        )}
+                    </div>
+                </DraggableElement>
+            ));
     }
 
     const currentBackgroundImageUrl =
@@ -985,83 +1150,7 @@ export default function VisitenkartenDesignerPage() {
                                                   </span>
                                                 </div>
                                             </DraggableElement>
-
-                                            {elements
-                                                .filter((element) => element.side === activeSide)
-                                                .map((element) => (
-                                                    <DraggableElement
-                                                        key={element.id}
-                                                        itemKey={element.id}
-                                                        position={element.position}
-                                                        cardRef={cardRef}
-                                                        onMove={updateElementPosition}
-                                                        onHistoryStart={saveHistory}
-                                                    >
-                                                        <div
-                                                            className={
-                                                                selectedElementId === element.id
-                                                                    ? "customElementWrapper customElementSelected"
-                                                                    : "customElementWrapper"
-                                                            }
-                                                            onPointerDown={() => {
-                                                                setSelectedElementId(element.id);
-                                                            }}
-                                                        >
-                                                            {selectedElementId === element.id && (
-                                                                <button
-                                                                    type="button"
-                                                                    className="customElementDeleteButton"
-                                                                    onPointerDown={(e) => e.stopPropagation()}
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        deleteElement(element.id);
-                                                                    }}
-                                                                >
-                                                                    ×
-                                                                </button>
-                                                            )}
-
-                                                            {element.type === "text" && (
-                                                                <div
-                                                                    className="customDesignerText"
-                                                                    contentEditable={editingElementId === element.id}
-                                                                    suppressContentEditableWarning
-                                                                    onDoubleClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        setEditingElementId(element.id);
-                                                                    }}
-                                                                    onPointerDown={(e) => {
-                                                                        if (editingElementId === element.id) {
-                                                                            e.stopPropagation();
-                                                                        }
-                                                                    }}
-                                                                    onBlur={(e) => {
-                                                                        const newText = e.currentTarget.innerText;
-
-                                                                        saveHistory();
-
-                                                                        setElements((prev) =>
-                                                                            prev.map((item) =>
-                                                                                item.id === element.id
-                                                                                    ? { ...item, content: newText }
-                                                                                    : item
-                                                                            )
-                                                                        );
-
-                                                                        setEditingElementId(null);
-                                                                    }}
-                                                                    style={{
-                                                                        color: element.color,
-                                                                        fontSize: `${element.fontSize}px`,
-                                                                        cursor: editingElementId === element.id ? "text" : "move",
-                                                                    }}
-                                                                >
-                                                                    {element.content}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </DraggableElement>
-                                                ))}
+                                            {renderCustomElements()}
                                         </div>
                                     )}
 
@@ -1385,13 +1474,17 @@ export default function VisitenkartenDesignerPage() {
                                     className="cardBackContentEditable"
                                     style={{
                                         backgroundColor: customBackgroundColor,
-                                        backgroundImage: backBackgroundImageUrl ? `url(${backBackgroundImageUrl})` : "none",
+                                        backgroundImage: backBackgroundImageUrl
+                                            ? `url(${backBackgroundImageUrl})`
+                                            : "none",
                                         backgroundSize: "cover",
                                         backgroundPosition: "center",
                                         backgroundRepeat: "no-repeat",
                                         color: customTextColor,
                                     }}
                                 >
+                                    {renderCustomElements()}
+
                                     <DraggableElement
                                         itemKey="backLogo"
                                         position={dragPositions.backLogo}
@@ -1623,20 +1716,24 @@ export default function VisitenkartenDesignerPage() {
                             <div className="designerElementPanel">
                                 <h4>Element hinzufügen</h4>
 
-                                <button type="button" onClick={addTextElement}>
+                                <button type="button" onClick={() => addElement("text")}>
                                     Text hinzufügen
                                 </button>
 
-                                <button type="button">
+                                <button type="button" onClick={() => addElement("emoji")}>
                                     Emoji hinzufügen
                                 </button>
 
-                                <button type="button">
+                                <button type="button" onClick={() => addElement("line")}>
                                     Linie hinzufügen
                                 </button>
 
-                                <button type="button">
+                                <button type="button" onClick={() => addElement("rect")}>
                                     Rechteck hinzufügen
+                                </button>
+
+                                <button type="button" onClick={() => addElement("circle")}>
+                                    Kreis hinzufügen
                                 </button>
                             </div>
                         )}
