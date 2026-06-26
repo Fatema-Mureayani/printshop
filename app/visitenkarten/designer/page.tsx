@@ -142,7 +142,7 @@ type DragPosition = {
 
 type DesignerElement = {
     id: string;
-    type: "text" | "emoji" | "line" | "rect" | "circle" ;
+    type: "text" | "emoji" | "line" | "rect" | "circle"  | "qrImage";
     side: "front" | "back";
     position: DragPosition;
     content?: string;
@@ -167,17 +167,6 @@ type DesignerState = {
     backBackgroundImageUrl: string;
     fontSize: number;
     elements: DesignerElement[];
-};
-
-type CustomText = {
-    id: number;
-    text: string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    fontSize: number;
-    color: string;
 };
 
 type DraggableElementProps = {
@@ -395,8 +384,6 @@ export default function VisitenkartenDesignerPage() {
     const [fontSize, setFontSize] = useState(18);
     const [logoUrl, setLogoUrl] = useState("");
 
-    const [customTexts, setCustomTexts] = useState<CustomText[]>([]);
-
     const [undoStack, setUndoStack] = useState<DesignerState[]>([]); // Rückgängig
     const [redoStack, setRedoStack] = useState<DesignerState[]>([]); // Wiederholen
     const [zoom, setZoom] = useState(100);
@@ -577,9 +564,43 @@ export default function VisitenkartenDesignerPage() {
         setElements((prev) => [...prev, baseElement]);
     }
 
-    // دالة Text hinzufügen
-    function addTextElement() {
-        addElement("text");
+    function handleQrUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0];
+
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+            alert("Bitte nur Bilder hochladen.");
+            return;
+        }
+
+        saveHistory();
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            const imageUrl = reader.result as string;
+
+            const newQrElement: DesignerElement = {
+                id: crypto.randomUUID(),
+                type: "qrImage",
+                side: activeSide,
+                content: imageUrl,
+                position: {
+                    x: 40,
+                    y: 30,
+                    width: 18,
+                    height: 25,
+                },
+                backgroundColor: "#ffffff",
+            };
+
+            setElements((prev) => [...prev, newQrElement]);
+        };
+
+        reader.readAsDataURL(file);
+
+        e.target.value = "";
     }
 
     function finishDesign() {
@@ -739,13 +760,20 @@ export default function VisitenkartenDesignerPage() {
                                 style={{ backgroundColor: element.backgroundColor }}
                             />
                         )}
+
+                        {element.type === "qrImage" && (
+                            <img
+                                className="customDesignerQr"
+                                src={element.content}
+                                alt="QR-Code"
+                            />
+                        )}
                     </div>
                 </DraggableElement>
             ));
+
     }
 
-    const currentBackgroundImageUrl =
-        activeSide === "front" ? frontBackgroundImageUrl : backBackgroundImageUrl;
 
     return (
         <main className="designerPage">
@@ -1000,45 +1028,6 @@ export default function VisitenkartenDesignerPage() {
                                                 color: customTextColor,
                                             }}
                                         >
-                                            {customTexts.map((item) => (
-                                                <DraggableElement
-                                                    key={item.id}
-                                                    itemKey="name"
-                                                    position={{
-                                                        x: item.x,
-                                                        y: item.y,
-                                                        width: item.width,
-                                                        height: item.height,
-                                                    }}
-                                                    cardRef={cardRef}
-                                                    onMove={(key, position) => {
-                                                        setCustomTexts((prev) =>
-                                                            prev.map((t) =>
-                                                                t.id === item.id
-                                                                    ? {
-                                                                        ...t,
-                                                                        x: position.x,
-                                                                        y: position.y,
-                                                                        width: position.width,
-                                                                        height: position.height,
-                                                                    }
-                                                                    : t
-                                                            )
-                                                        );
-                                                    }}
-                                                    onHistoryStart={saveHistory}
-                                                >
-                                                    <div
-                                                        style={{
-                                                            fontSize: item.fontSize,
-                                                            color: item.color,
-                                                            fontWeight: 600,
-                                                        }}
-                                                    >
-                                                        {item.text}
-                                                    </div>
-                                                </DraggableElement>
-                                            ))}
                                             <DraggableElement
                                                 itemKey="logo"
                                                 position={dragPositions.logo}
@@ -1119,17 +1108,17 @@ export default function VisitenkartenDesignerPage() {
                                                       {phone}
                                                   </span>
 
-                                                  <span className="cardContactItem">
+                                                    <span className="cardContactItem">
                                                       <span
                                                           className="cardContactIcon"
                                                           style={{ color: customAccentColor }}
                                                       >
                                                           <DesignerIcon type="mail" />
                                                       </span>
-                                                      {email}
+                                                        {email}
                                                   </span>
 
-                                                  <span className="cardContactItem">
+                                                    <span className="cardContactItem">
                                                       <span
                                                           className="cardContactIcon"
                                                           style={{ color: customAccentColor }}
@@ -1139,7 +1128,7 @@ export default function VisitenkartenDesignerPage() {
                                                         {website}
                                                   </span>
 
-                                                  <span className="cardContactItem">
+                                                    <span className="cardContactItem">
                                                       <span
                                                           className="cardContactIcon"
                                                           style={{ color: customAccentColor }}
@@ -1262,8 +1251,8 @@ export default function VisitenkartenDesignerPage() {
 
                                                 <span className="cardContactItem">
                                                   <span
-                                                    className="cardContactIcon"
-                                                    style={{ color: customAccentColor }}
+                                                      className="cardContactIcon"
+                                                      style={{ color: customAccentColor }}
                                                   >
                                                     <DesignerIcon type="phone" />
                                                 </span>
@@ -1272,8 +1261,8 @@ export default function VisitenkartenDesignerPage() {
 
                                                 <span className="cardContactItem">
                                                   <span
-                                                     className="cardContactIcon"
-                                                     style={{ color: customAccentColor }}
+                                                      className="cardContactIcon"
+                                                      style={{ color: customAccentColor }}
                                                   >
                                                       <DesignerIcon type="mail" />
                                                   </span>
@@ -1338,7 +1327,7 @@ export default function VisitenkartenDesignerPage() {
                                                       >
                                                           <DesignerIcon type="phone" />
                                                       </span>
-                                                      {phone}
+                                                    {phone}
                                                   </span>
 
                                                     <span className="cardContactItem">
@@ -1735,6 +1724,16 @@ export default function VisitenkartenDesignerPage() {
                                 <button type="button" onClick={() => addElement("circle")}>
                                     Kreis hinzufügen
                                 </button>
+
+                                <label className="designerElementUploadButton">
+                                    QR-Code hochladen
+                                    <input
+                                        type="file"
+                                        accept="image/png,image/jpeg,image/jpg,image/webp"
+                                        onChange={handleQrUpload}
+                                        hidden
+                                    />
+                                </label>
                             </div>
                         )}
 
