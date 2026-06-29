@@ -16,7 +16,7 @@ const colors = [
     { name: "Khaki", file: "khaki", hex: "#696142" },
     { name: "Rot", file: "red", hex: "#dc2626" },
     { name: "Orange", file: "orange", hex: "#ff5f2e" },
-    { name: "Pink", file: "pink", hex: "#dd004e" },
+    { name: "Brown", file: "brown", hex: "#694939" },
     { name: "Cherry Berry", file: "cherry berry", hex: "#852638" },
     { name: "Navi", file: "navi", hex: "#1a2330" },
     { name: "Schwarz", file: "black", hex: "#111111" },

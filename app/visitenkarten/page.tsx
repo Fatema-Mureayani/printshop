@@ -125,6 +125,10 @@ export default function VisitenkartenPage() {
             designWishes: designWishes,
             designerData: designerData,
 
+            designerPreviewFront: designerData?.designerPreviewFront ?? "",
+            designerPreviewBack: designerData?.designerPreviewBack ?? "",
+            designerJson: designerData?.designerJson ?? "",
+
             color: selectedSeiten,
             colorFile: "",
             size: selectedMenge,
@@ -143,13 +147,8 @@ export default function VisitenkartenPage() {
                 (selectedDruckdaten === "Gestaltungsservice" && designWishes
                     ? `\nDesignwünsche: ${designWishes}`
                     : "") +
-                (selectedDruckdaten === "Online Designer" && designerData
-                    ? `\nOnline Designer Daten:\n` +
-                    `Name: ${designerData.name}\n` +
-                    `Position: ${designerData.jobTitle}\n` +
-                    `Telefon: ${designerData.phone}\n` +
-                    `E-Mail: ${designerData.email}\n` +
-                    `Webseite: ${designerData.website}`
+                (selectedDruckdaten === "Online Designer"
+                    ? `\nOnline Designer: Ja`
                     : ""),
 
             font: "",
@@ -424,6 +423,40 @@ export default function VisitenkartenPage() {
                                     >
                                         Design bearbeiten
                                     </button>
+
+                                    {designerData.designerPreviewFront && (
+                                        <>
+                                            <h4>Vorderseite</h4>
+
+                                            <img
+                                                src={`http://localhost:5098${designerData.designerPreviewFront}`}
+                                                alt="Vorderseite"
+                                                style={{
+                                                    width: "100%",
+                                                    border: "1px solid #ddd",
+                                                    borderRadius: 8,
+                                                    marginTop: 10,
+                                                }}
+                                            />
+                                        </>
+                                    )}
+
+                                    {designerData.designerPreviewBack && (
+                                        <>
+                                            <h4>Rückseite</h4>
+
+                                            <img
+                                                src={`http://localhost:5098${designerData.designerPreviewBack}`}
+                                                alt="Rückseite"
+                                                style={{
+                                                    width: "100%",
+                                                    border: "1px solid #ddd",
+                                                    borderRadius: 8,
+                                                    marginTop: 10,
+                                                }}
+                                            />
+                                        </>
+                                    )}
                                 </div>
                             )}
                         </div>

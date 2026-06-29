@@ -16,6 +16,9 @@ type CartItem = {
     druckdatenFileName?: string;
     druckdatenFileUrl?: string;
     designWishes?: string;
+    designerPreviewFront?: string;
+    designerPreviewBack?: string;
+    designerJson?: string;
     font: string;
     fontSize: number;
     textColor: string;
@@ -135,6 +138,9 @@ export default function WarenkorbPage() {
                     druckdatenFileName: item.druckdatenFileName,
                     druckdatenFileUrl: item.druckdatenFileUrl,
                     designWishes: item.designWishes,
+                    designerPreviewFront: item.designerPreviewFront,
+                    designerPreviewBack: item.designerPreviewBack,
+                    designerJson: item.designerJson,
                     font: item.font,
                     fontSize: item.fontSize,
                     textColor: item.textColor,
@@ -262,6 +268,39 @@ export default function WarenkorbPage() {
                                                 <p>
                                                     <strong>Designwünsche:</strong> {item.designWishes}
                                                 </p>
+                                            )}
+
+                                            {item.designerPreviewFront && (
+                                                <>
+                                                    <p><strong>Vorderseite:</strong></p>
+
+                                                    <img
+                                                        src={`http://localhost:5098${item.designerPreviewFront}`}
+                                                        alt="Vorderseite"
+                                                        style={{
+                                                            width: 220,
+                                                            border: "1px solid #ddd",
+                                                            borderRadius: 8,
+                                                            marginBottom: 12,
+                                                        }}
+                                                    />
+                                                </>
+                                            )}
+
+                                            {item.designerPreviewBack && (
+                                                <>
+                                                    <p><strong>Rückseite:</strong></p>
+
+                                                    <img
+                                                        src={`http://localhost:5098${item.designerPreviewBack}`}
+                                                        alt="Rückseite"
+                                                        style={{
+                                                            width: 220,
+                                                            border: "1px solid #ddd",
+                                                            borderRadius: 8,
+                                                        }}
+                                                    />
+                                                </>
                                             )}
                                         </>
                                     ) : (

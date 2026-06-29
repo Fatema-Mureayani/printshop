@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { toPng } from "html-to-image";
 
 type Template = {
     id: string;
@@ -380,6 +381,7 @@ export default function VisitenkartenDesignerPage() {
 
     const [showColorPanel, setShowColorPanel] = useState(false);
     const [showElementPanel, setShowElementPanel] = useState(false);
+    const [showAlignPanel, setShowAlignPanel] = useState(false);
 
     const [fontSize, setFontSize] = useState(18);
     const [logoUrl, setLogoUrl] = useState("");
@@ -395,6 +397,56 @@ export default function VisitenkartenDesignerPage() {
     const [showBackgroundPanel, setShowBackgroundPanel] = useState(false);
 
     const [editingElementId, setEditingElementId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const savedDesign = localStorage.getItem("visitenkartenDesignerData");
+
+        if (!savedDesign) return;
+
+        try {
+            const data = JSON.parse(savedDesign);
+
+            setName(data.name ?? "Max Mustermann");
+            setJobTitle(data.jobTitle ?? "Geschäftsführer");
+            setPhone(data.phone ?? "+49 123 456789");
+            setEmail(data.email ?? "info@example.com");
+            setWebsite(data.website ?? "www.example.com");
+            setAddress(data.address ?? "Musterstraße 1");
+
+            setCustomBackgroundColor(data.backgroundColor ?? "#ffffff");
+            setCustomTextColor(data.textColor ?? "#111111");
+            setCustomAccentColor(data.accentColor ?? "#d6af28");
+
+            setFontSize(data.fontSize ?? 18);
+
+            if (data.logoUrl) {
+                setLogoUrl(data.logoUrl);
+            }
+
+            if (data.frontBackgroundImageUrl) {
+                setFrontBackgroundImageUrl(data.frontBackgroundImageUrl);
+            }
+
+            if (data.backBackgroundImageUrl) {
+                setBackBackgroundImageUrl(data.backBackgroundImageUrl);
+            }
+
+            if (data.dragPositions) {
+                setDragPositions(data.dragPositions);
+            }
+
+            if (data.elements) {
+                setElements(data.elements);
+            }
+
+            const template = templates.find((t) => t.id === data.templateId);
+            if (template) {
+                setSelectedTemplate(template);
+            }
+        } catch (error) {
+            console.error("Designer-Daten konnten nicht geladen werden:", error);
+        }
+    }, []);
 
     function getCurrentDesignerState(): DesignerState {
         return {
@@ -482,6 +534,12 @@ export default function VisitenkartenDesignerPage() {
 
         reader.readAsDataURL(file);
     }
+
+    function removeLogo() {
+        saveHistory();
+        setLogoUrl("");
+    }
+
     // دالة رفع صورة الخلفية
     function handleBackgroundUpload(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
@@ -603,7 +661,120 @@ export default function VisitenkartenDesignerPage() {
         e.target.value = "";
     }
 
-    function finishDesign() {
+    function alignSelectedElement(
+        direction: "left" | "center" | "right" | "top" | "middle" | "bottom"
+    ) {
+        if (!selectedElementId) {
+            alert("Bitte zuerst ein Element auswählen.");
+            return;
+        }
+
+        saveHistory();
+
+        setElements((prev) =>
+            prev.map((element) => {
+                if (element.id !== selectedElementId) return element;
+
+                const position = { ...element.position };
+
+                if (direction === "left") position.x = 0;
+                if (direction === "center") position.x = (100 - position.width) / 2;
+                if (direction === "right") position.x = 100 - position.width;
+
+                if (direction === "top") position.y = 0;
+                if (direction === "middle") position.y = (100 - position.height) / 2;
+                if (direction === "bottom") position.y = 100 - position.height;
+
+                return {
+                    ...element,
+                    position,
+                };
+            })
+        );
+    }
+
+    function dataUrlToFile(dataUrl: string, fileName: string) {
+        const arr = dataUrl.split(",");
+        const mime = arr[0].match(/:(.*?);/)?.[1] || "image/png";
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+
+        return new File([u8arr], fileName, { type: mime });
+    }
+
+    async function uploadDesignerPreview(dataUrl: string, fileName: string) {
+        const file = dataUrlToFile(dataUrl, fileName);
+        const formData = new FormData();
+
+        formData.append("file", file);
+
+        const res = await fetch("http://localhost:5098/api/uploads/druckdaten", {
+            method: "POST",
+            body: formData,
+        });
+
+        if (!res.ok) {
+            throw new Error("Designer-Vorschau konnte nicht hochgeladen werden.");
+        }
+
+        const data = await res.json();
+
+        return data.fileUrl ?? data.FileUrl;
+    }
+
+    function waitForRender() {
+        return new Promise((resolve) => {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(resolve);
+            });
+        });
+    }
+
+    async function finishDesign() {
+        let designerPreviewFront = "";
+        let designerPreviewBack = "";
+
+        const originalSide = activeSide;
+
+        if (cardRef.current) {
+            setActiveSide("front");
+            await waitForRender();
+
+            const frontDataUrl = await toPng(cardRef.current, {
+                cacheBust: true,
+                pixelRatio: 2,
+                skipFonts: true,
+            });
+
+            designerPreviewFront = await uploadDesignerPreview(
+                frontDataUrl,
+                "visitenkarte-vorderseite.png"
+            );
+
+            if (isDoubleSided) {
+                setActiveSide("back");
+                await waitForRender();
+
+                const backDataUrl = await toPng(cardRef.current, {
+                    cacheBust: true,
+                    pixelRatio: 2,
+                    skipFonts: true,
+                });
+
+                designerPreviewBack = await uploadDesignerPreview(
+                    backDataUrl,
+                    "visitenkarte-rueckseite.png"
+                );
+            }
+
+            setActiveSide(originalSide);
+        }
+
         const designData = {
             seiten,
             format,
@@ -624,9 +795,16 @@ export default function VisitenkartenDesignerPage() {
             logoUrl,
             hasBackSide: isDoubleSided,
             dragPositions,
+            elements,
+            designerPreviewFront,
+            designerPreviewBack,
+            designerJson: "",
         };
 
+        designData.designerJson = JSON.stringify(designData);
+
         localStorage.setItem("visitenkartenDesignerData", JSON.stringify(designData));
+
         router.push("/visitenkarten");
     }
 
@@ -814,7 +992,7 @@ export default function VisitenkartenDesignerPage() {
                         className="designerFinishTopButton"
                         onClick={finishDesign}
                     >
-                        ✓ Design übernehmen
+                         Design übernehmen
                     </button>
                 </div>
             </header>
@@ -947,9 +1125,11 @@ export default function VisitenkartenDesignerPage() {
                         </span>
                         <div>
                             <label>Adresse</label>
-                            <input value={address}
-                                   onFocus={saveHistory}
-                                   onChange={(e) => setAddress(e.target.value)}
+                            <textarea
+                                value={address}
+                                onFocus={saveHistory}
+                                onChange={(e) => setAddress(e.target.value)}
+                                rows={3}
                             />
                         </div>
                     </div>
@@ -965,6 +1145,15 @@ export default function VisitenkartenDesignerPage() {
                                 accept="image/png,image/jpeg"
                                 onChange={handleLogoUpload}
                             />
+                            {logoUrl && (
+                                <button
+                                    type="button"
+                                    className="designerRemoveLogoButton"
+                                    onClick={removeLogo}
+                                >
+                                    Logo entfernen
+                                </button>
+                            )}
                             <small>PNG oder JPG</small>
                         </div>
                     </div>
@@ -1135,7 +1324,11 @@ export default function VisitenkartenDesignerPage() {
                                                       >
                                                           <DesignerIcon type="location" />
                                                       </span>
-                                                        {address}
+                                                        <span className="cardMultilineText">
+                                                          <span className="cardMultilineText">
+                                                            {address}
+                                                          </span>
+                                                        </span>
                                                   </span>
                                                 </div>
                                             </DraggableElement>
@@ -1209,7 +1402,9 @@ export default function VisitenkartenDesignerPage() {
                                                         <span className="cardContactIcon">
                                                             <DesignerIcon type="location" />
                                                         </span>
-                                                        {address}
+                                                         <span className="cardMultilineText">
+                                                            {address}
+                                                         </span>
                                                     </span>
                                                 </div>
                                             </div>
@@ -1286,7 +1481,9 @@ export default function VisitenkartenDesignerPage() {
                                                     >
                                                         <DesignerIcon type="location" />
                                                     </span>
-                                                    {address}
+                                                    <span className="cardMultilineText">
+                                                      {address}
+                                                    </span>
                                                 </span>
                                             </div>
                                         </div>
@@ -1357,7 +1554,9 @@ export default function VisitenkartenDesignerPage() {
                                                       >
                                                           <DesignerIcon type="location" />
                                                       </span>
-                                                        {address}
+                                                        <span className="cardMultilineText">
+                                                          {address}
+                                                        </span>
                                                   </span>
                                                 </div>
                                             </div>
@@ -1452,7 +1651,9 @@ export default function VisitenkartenDesignerPage() {
                                                   >
                                                       <DesignerIcon type="location" />
                                                   </span>
+                                                  <span className="cardMultilineText">
                                                     {address}
+                                                  </span>
                                               </span>
                                             </div>
                                         </div>
@@ -1737,7 +1938,40 @@ export default function VisitenkartenDesignerPage() {
                             </div>
                         )}
 
-                        <button type="button">Ausrichten ›</button>
+                        <button
+                            type="button"
+                            onClick={() => setShowAlignPanel(!showAlignPanel)}
+                        >
+                            Ausrichten ›
+                        </button>
+
+                        {showAlignPanel && (
+                            <div className="designerAlignPanel">
+                                <button type="button" onClick={() => alignSelectedElement("left")}>
+                                    Links ausrichten
+                                </button>
+
+                                <button type="button" onClick={() => alignSelectedElement("center")}>
+                                    Horizontal zentrieren
+                                </button>
+
+                                <button type="button" onClick={() => alignSelectedElement("right")}>
+                                    Rechts ausrichten
+                                </button>
+
+                                <button type="button" onClick={() => alignSelectedElement("top")}>
+                                    Oben ausrichten
+                                </button>
+
+                                <button type="button" onClick={() => alignSelectedElement("middle")}>
+                                    Vertikal zentrieren
+                                </button>
+
+                                <button type="button" onClick={() => alignSelectedElement("bottom")}>
+                                    Unten ausrichten
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     <div className="designerTipBox">

@@ -15,6 +15,9 @@ type Order = {
     druckdatenFileName: string | null;
     druckdatenFileUrl: string | null;
     designWishes: string | null;
+    designerPreviewFront: string | null;
+    designerPreviewBack: string | null;
+    designerJson: string | null;
     font: string | null;
     fontSize: number;
     textColor: string | null;
@@ -384,6 +387,30 @@ export default function AdminOrdersPage() {
                                                                             <br />
                                                                             {item.designWishes}
                                                                         </p>
+                                                                    )}
+
+                                                                    {item.designerPreviewFront && (
+                                                                        <div className="adminDruckdatenPreviewBox">
+                                                                            <p><strong>Online Designer Vorderseite:</strong></p>
+
+                                                                            <img
+                                                                                src={`http://localhost:5098${item.designerPreviewFront}`}
+                                                                                alt="Online Designer Vorderseite"
+                                                                                className="adminDruckdatenPreview"
+                                                                            />
+                                                                        </div>
+                                                                    )}
+
+                                                                    {item.designerPreviewBack && (
+                                                                        <div className="adminDruckdatenPreviewBox">
+                                                                            <p><strong>Online Designer Rückseite:</strong></p>
+
+                                                                            <img
+                                                                                src={`http://localhost:5098${item.designerPreviewBack}`}
+                                                                                alt="Online Designer Rückseite"
+                                                                                className="adminDruckdatenPreview"
+                                                                            />
+                                                                        </div>
                                                                     )}
 
                                                                 </div>
