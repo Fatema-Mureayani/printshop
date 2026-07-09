@@ -1,133 +1,128 @@
 .designPage {
   min-height: 100vh;
-  padding: 24px;
-  background-color: black;
-  color: white;
+  padding: 32px;
+  background: #f5f5f5;
+  color: #111111;
+  font-family: Arial, sans-serif;
 }
 
-/* الشريط العلوي: العنوان يسار، زر السلة يمين */
 .designTopBar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
-  width: 100%;
 }
 
 .designTopBar h1 {
-  font-size: 32px;
+  font-size: 34px;
   margin: 0;
-  color: #facc15;
+  color: #111111;
 }
 
-/* زر Zum Warenkorb فوق يمين */
 .topCartButton {
-  background-color: #f44336;
-  color: white;
-  padding: 12px 22px;
+  background: #d4af37;
+  color: #111111;
+  padding: 13px 22px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 900;
   font-size: 16px;
   text-decoration: none;
-  display: inline-block;
 }
 
-.topCartButton:hover {
-  background-color: #d32f2f;
-}
-
-/* العنوان القديم لو موجود خارج topbar */
-h1 {
-  font-size: 32px;
-  margin-bottom: 24px;
-  color: #facc15;
-}
-
-/* تقسيم الصفحة يمين ويسار */
 .designLayout {
-  display: flex;
-  gap: 40px;
+  display: grid;
+  grid-template-columns: 36% 64%;
+  gap: 28px;
   align-items: flex-start;
 }
 
-/* القسم اليسار */
 .controlPanel {
-  width: 42%;
-  max-width: 620px;
+  background: #ffffff;
+  border: 1px solid #e2e2e2;
+  border-radius: 16px;
+  padding: 24px;
+  height: fit-content;
 }
 
-/* القسم اليمين */
-.previewPanel {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 20px;
+.designerSection {
+  margin-bottom: 24px;
 }
 
-.textInput,
-.fontSelection,
-.fontSizeSelection,
-.positionSelection,
-.rotationSelection,
-.bendSelection,
-.colorSelection {
-  margin-bottom: 20px;
+.designerSection h2 {
+  font-size: 20px;
+  margin: 0 0 14px;
+  color: #111111;
+}
+
+.sideTabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.sideTabs button,
+.secondaryButton {
+  min-height: 48px;
+  border: 2px solid #dddddd;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #111111;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.activeSideTab {
+  border-color: #d4af37 !important;
+  background: #fffdf4 !important;
+  color: #d4af37 !important;
+}
+
+.designerUploadBox {
+  display: inline-block;
+  width: 100%;
+  border: 2px dashed #cccccc;
+  border-radius: 12px;
+  padding: 18px;
+  text-align: center;
+  font-weight: 900;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.designerUploadBox input {
+  display: none;
 }
 
 label {
   display: block;
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 6px;
+  font-size: 15px;
+  font-weight: 900;
+  margin: 14px 0 8px;
+}
+
+textarea,
+select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 16px;
+  font-family: inherit;
+  background: #ffffff;
+  color: #111111;
 }
 
 textarea {
-  width: 100%;
-  height: 70px;
-  padding: 10px;
-  font-size: 18px;
+  min-height: 90px;
   resize: vertical;
 }
 
-select {
-  width: 100%;
-  padding: 10px;
-  font-size: 18px;
-}
-
-.tshirtPreview {
-  display: flex;
-  justify-content: center;
-}
-
-.tshirtPreview canvas {
-  max-width: 100%;
-  height: auto;
-}
-
-/* زر الإضافة للسلة */
-.cartButton {
-  background-color: #f44336;
-  color: white;
-  padding: 12px 22px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 16px;
-  margin-top: 10px;
-}
-
-.cartButton:hover {
-  background-color: #d32f2f;
-}
-
-/* السلايدر */
 .customSlider {
-  width: 260px;
+  width: 100%;
   appearance: none;
   -webkit-appearance: none;
   background: transparent;
@@ -135,8 +130,8 @@ select {
 }
 
 .customSlider::-webkit-slider-runnable-track {
-  height: 4px;
-  background: #333;
+  height: 5px;
+  background: #dddddd;
   border-radius: 999px;
 }
 
@@ -145,108 +140,217 @@ select {
   -webkit-appearance: none;
   width: 22px;
   height: 22px;
-  background: #facc15;
+  background: #d4af37;
   border-radius: 50%;
-  border: 2px solid white;
+  border: 2px solid #ffffff;
   margin-top: -9px;
 }
 
 .customSlider::-moz-range-track {
-  height: 4px;
-  background: #333;
+  height: 5px;
+  background: #dddddd;
   border-radius: 999px;
 }
 
 .customSlider::-moz-range-thumb {
   width: 22px;
   height: 22px;
-  background: #facc15;
+  background: #d4af37;
   border-radius: 50%;
-  border: 2px solid white;
+  border: 2px solid #ffffff;
 }
 
-/* Color Picker Icon */
-.colorSelection {
-  margin-bottom: 20px;
-}
-
-.colorPickerIcon {
-  width: 58px;
-  height: 58px;
-  border-radius: 10px;
-  border: 2px solid white;
+.normalColorInput {
+  width: 70px;
+  height: 44px;
+  border: none;
+  background: transparent;
   cursor: pointer;
+}
+
+.previewPanel {
+  background: #ffffff;
+  border: 1px solid #e2e2e2;
+  border-radius: 16px;
+  padding: 28px;
+  min-height: 650px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.designerPreview {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.shirtStage {
   position: relative;
-  display: inline-flex;
+  width: min(78vw, 620px);
+  max-width: 620px;
+  aspect-ratio: 1 / 1.35;
+  display: flex;
   align-items: center;
   justify-content: center;
-  background:
-          linear-gradient(
-                  135deg,
-                  #ff0000 0%,
-                  #ff9900 18%,
-                  #ffff00 35%,
-                  #00ff00 50%,
-                  #00ffff 65%,
-                  #0000ff 80%,
-                  #ff00ff 100%
-          );
-  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.25);
-  margin-top: 8px;
+}
+
+.designerTshirtImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.printArea {
+  position: absolute;
+  z-index: 4;
   overflow: hidden;
-  transition: transform 0.15s ease;
+  touch-action: none;
 }
 
-.colorPickerIcon:hover {
-  transform: scale(1.05);
+.printArea::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px dashed rgba(212, 175, 55, 0.65);
+  pointer-events: none;
+  border-radius: 4px;
 }
 
-.pickerSymbol {
-  color: white;
-  font-size: 28px;
-  font-weight: bold;
-  text-shadow: 0 2px 4px black;
+.designerObject {
+  position: absolute;
+  z-index: 5;
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  object-fit: contain;
+  max-width: 95%;
+  max-height: 95%;
+}
+
+.designerText {
+  position: absolute;
+  z-index: 6;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  font-weight: 900;
+  white-space: nowrap;
+  padding: 4px 6px;
+  max-width: 95%;
+  min-width: 60px;
+  min-height: 30px;
+  text-align: center;
+}
+
+.textList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 14px 0;
+}
+
+.textListItem {
+  width: 100%;
+  border: 2px solid #dddddd;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #111111;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.designerHint {
+  margin: 10px 0 0;
+  color: #666666;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.activeTextListItem {
+  border-color: #d4af37;
+  background: #fffdf4;
+  color: #d4af37;
+}
+
+.activeDesignerObject {
+  outline: 2px solid #d4af37;
+  outline-offset: 3px;
+}
+
+.cartButton {
+  width: 100%;
+  background: #d4af37;
+  color: #111111;
+  padding: 16px 22px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 900;
+  font-size: 17px;
+  margin-top: 10px;
+}
+
+.cartButton:hover,
+.topCartButton:hover {
+  background: #c9a928;
+}
+
+.removeDesignerButton {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  background: #dc2626;
+  color: #ffffff;
+  padding: 13px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.arcTextBox {
+  position: relative;
+  display: inline-block;
+  overflow: visible;
   pointer-events: none;
 }
 
-.hiddenColorInput {
+.arcTextChar {
   position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-  width: 100%;
-  height: 100%;
+  display: inline-block;
+  transform-origin: center center;
+  font-weight: 900;
 }
 
-.selectedColorText {
-  margin-left: 12px;
-  font-size: 15px;
-  font-weight: bold;
-  color: white;
-}
-
-/* للموبايل */
-@media (max-width: 900px) {
-  .designTopBar {
-    align-items: flex-start;
-    gap: 16px;
-  }
-
+@media (max-width: 1000px) {
   .designLayout {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
-  .controlPanel {
-    width: 100%;
-    max-width: none;
+  .shirtStage {
+    width: min(92vw, 560px);
+  }
+}
+
+@media (max-width: 650px) {
+  .designPage {
+    padding: 18px;
+  }
+
+  .designTopBar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .sideTabs {
+    grid-template-columns: 1fr;
   }
 
   .previewPanel {
-    width: 100%;
-  }
-
-  .customSlider {
-    width: 100%;
-    max-width: 260px;
+    padding: 16px;
+    min-height: 450px;
   }
 }

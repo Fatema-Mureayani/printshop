@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+
+type PrintSide = "front" | "back" | "side-left" | "side-right" | "detail";
+type ActiveElementType = "image" | "text";
 
 type ShirtConfig = {
     productId: number;
@@ -10,9 +13,34 @@ type ShirtConfig = {
     color: string;
     colorFile: string;
     size: string;
-    text: string;
-    description: string;
+    druckdaten?: string;
+    text?: string;
+    description?: string;
     price: number;
+};
+
+type DesignImage = {
+    src: string;
+    x: number;
+    y: number;
+    width: number;
+};
+
+type DesignText = {
+    id: string;
+    text: string;
+    x: number;
+    y: number;
+    fontSize: number;
+    color: string;
+    font: string;
+    rotate: number;
+    bend: number;
+};
+
+type SideDesign = {
+    image?: DesignImage;
+    texts: DesignText[];
 };
 
 type CartItem = {
@@ -22,160 +50,394 @@ type CartItem = {
     color: string;
     colorFile: string;
     size: string;
-    customText: string;
-    description: string;
-    font: string;
-    fontSize: number;
-    textColor: string;
-    position: string;
-    rotate: number;
-    bend: number;
     price: number;
-    previewImage: string;
+    quantity: number;
+    designData: Partial<Record<PrintSide, SideDesign>>;
 };
 
-function drawArcText(
-    ctx: CanvasRenderingContext2D,
-    text: string,
-    centerX: number,
-    baseY: number,
-    radius: number,
-    isTop = true
-) {
-    const chars = [...text];
-    const spacing = 2;
+const sideLabels: Record<PrintSide, string> = {
+    front: "Vorderseite",
+    back: "Rückseite",
+    "side-left": "Linke Seite",
+    "side-right": "Rechte Seite",
+    detail: "Detailansicht",
+};
 
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
+const printAreas = {
+    front: {
+        left: 30,
+        top: 22,
+        width: 44,
+        height: 58,
+        minWidth: 20,
+        maxWidth: 90,
+        defaultWidth: 55,
+    },
+    back: {
+        left: 28,
+        top: 18,
+        width: 44,
+        height: 62,
+        minWidth: 20,
+        maxWidth: 90,
+        defaultWidth: 55,
+    },
+    "side-left": {
+        left: 36,
+        top: 18,
+        width: 20,
+        height: 20,
+        minWidth: 25,
+        maxWidth: 95,
+        defaultWidth: 60,
+    },
 
-    const widths = chars.map((char) => ctx.measureText(char).width + spacing);
-    const totalAngle = widths.reduce((sum, w) => sum + w / radius, 0);
+    "side-right": {
+        left: 41,
+        top: 14,
+        width: 20,
+        height: 20,
+        minWidth: 25,
+        maxWidth: 95,
+        defaultWidth: 60,
+    },
+    detail: {
+        left: 0,
+        top: 0,
+        width: 0,
+        height: 0,
+        minWidth: 0,
+        maxWidth: 0,
+        defaultWidth: 0,
+    },
+};
+
+const fontOptions = [
+    { label: "Arial", value: "Arial, sans-serif" },
+    { label: "Verdana", value: "Verdana, sans-serif" },
+    { label: "Times New Roman", value: "'Times New Roman', serif" },
+    { label: "Georgia", value: "Georgia, serif" },
+    { label: "Courier New", value: "'Courier New', monospace" },
+    { label: "Trebuchet MS", value: "'Trebuchet MS', sans-serif" },
+    { label: "Impact", value: "Impact, sans-serif" },
+    { label: "Comic Sans", value: "'Comic Sans MS', cursive" },
+];
+
+function ArcText({ text }: { text: DesignText }) {
+    if (text.bend === 0) {
+        return <span>{text.text}</span>;
+    }
+
+    const chars = [...text.text];
+    const isTop = text.bend > 0;
+    const absBend = Math.abs(text.bend);
+
+    const radius = Math.max(45, 190 - absBend);
+    const spacing = text.fontSize * 0.65;
+    const totalAngle = (chars.length * spacing) / radius;
 
     let currentAngle = -totalAngle / 2;
 
-    chars.forEach((char, i) => {
-        const charAngle = widths[i] / radius;
-        const angle = currentAngle + charAngle / 2;
+    return (
+        <span
+            className="arcTextBox"
+            style={{
+                width: `${radius * 2}px`,
+                height: `${radius}px`,
+            }}
+        >
+      {chars.map((char, index) => {
+          const charAngle = spacing / radius;
+          const angle = currentAngle + charAngle / 2;
 
-        const x = centerX + radius * Math.sin(angle);
-        const y = isTop
-            ? baseY + radius - radius * Math.cos(angle)
-            : baseY - radius + radius * Math.cos(angle);
+          currentAngle += charAngle;
 
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(isTop ? angle : -angle);
-        ctx.fillText(char, 0, 0);
-        ctx.restore();
+          const x = radius + radius * Math.sin(angle);
+          const y = isTop
+              ? radius - radius * Math.cos(angle)
+              : radius * Math.cos(angle);
 
-        currentAngle += charAngle;
-    });
-}
-
-function getTextPosition(canvas: HTMLCanvasElement, position: string) {
-    switch (position) {
-        case "top-left":
-            return { x: 120, y: 120 };
-        case "top-right":
-            return { x: canvas.width - 120, y: 120 };
-        case "bottom-left":
-            return { x: 120, y: canvas.height - 120 };
-        case "bottom-right":
-            return { x: canvas.width - 120, y: canvas.height - 120 };
-        default:
-            return { x: canvas.width / 2, y: canvas.height / 2 };
-    }
+          return (
+              <span
+                  key={`${char}-${index}`}
+                  className="arcTextChar"
+                  style={{
+                      left: `${x}px`,
+                      top: `${y}px`,
+                      transform: `translate(-50%, -50%) rotate(${
+                          isTop ? angle : -angle
+                      }rad)`,
+                  }}
+              >
+            {char === " " ? "\u00A0" : char}
+          </span>
+          );
+      })}
+    </span>
+    );
 }
 
 export default function DesignPage() {
     const router = useRouter();
-    const [designText, setDesignText] = useState("");
-    const [font, setFont] = useState("sans-serif");
-    const [position, setPosition] = useState("center");
-    const [rotate, setRotate] = useState(0);
-    const [textColor, setTextColor] = useState("#facc15");
-    const [bend, setBend] = useState(0);
-    const [fontSize, setFontSize] = useState(28);
 
     const [shirtConfig, setShirtConfig] = useState<ShirtConfig | null>(null);
+    const [selectedGalleryIndex, setSelectedGalleryIndex] = useState(0);
 
-    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const [designs, setDesigns] = useState<
+        Partial<Record<PrintSide, SideDesign>>
+    >({});
 
-    // هنا نقرأ بيانات التيشيرت المختار من صفحة /t-shirt
+    const [activeElement, setActiveElement] =
+        useState<ActiveElementType>("text");
+    const [activeTextId, setActiveTextId] = useState<string | null>(null);
+
+    const [dragData, setDragData] = useState<{
+        side: PrintSide;
+        element: ActiveElementType;
+        textId?: string;
+    } | null>(null);
+
+    const selectedColorFile = shirtConfig?.colorFile || "white";
+
+    const galleryImages: { side: PrintSide; src: string; alt: string }[] = [
+        {
+            side: "front",
+            src: `/tshirts/${selectedColorFile}.png`,
+            alt: "T-Shirt Vorderseite",
+        },
+        {
+            side: "back",
+            src: "/tshirts/white-back.png",
+            alt: "T-Shirt Rückseite",
+        },
+        {
+            side: "side-left",
+            src: "/tshirts/white-side-left.png",
+            alt: "Linker Ärmel",
+        },
+        {
+            side: "side-right",
+            src: "/tshirts/white-side-right.png",
+            alt: "Rechter Ärmel",
+        },
+        {
+            side: "detail",
+            src: "/tshirts/white-detail.png",
+            alt: "T-Shirt Detailansicht",
+        },
+    ];
+
+    const selectedSide = galleryImages[selectedGalleryIndex].side;
+    const selectedPrintArea = printAreas[selectedSide];
+    const selectedDesign = designs[selectedSide] || { texts: [] };
+
+    const activeText =
+        selectedDesign.texts.find((text) => text.id === activeTextId) || null;
+
     useEffect(() => {
         const savedConfig = localStorage.getItem("tshirtConfig");
 
         if (savedConfig) {
             const parsedConfig: ShirtConfig = JSON.parse(savedConfig);
-
             setShirtConfig(parsedConfig);
 
             if (parsedConfig.text) {
-                setDesignText(parsedConfig.text);
+                const id = crypto.randomUUID();
+
+                setDesigns({
+                    front: {
+                        texts: [
+                            {
+                                id,
+                                text: parsedConfig.text,
+                                x: 50,
+                                y: 50,
+                                fontSize: 18,
+                                color: "#facc15",
+                                font: "Arial, sans-serif",
+                                rotate: 0,
+                                bend: 0,
+                            },
+                        ],
+                    },
+                });
+
+                setActiveTextId(id);
             }
         }
     }, []);
 
-    // هنا نرسم التيشيرت والنص على canvas
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
+    function getSideDesign(side: PrintSide): SideDesign {
+        return designs[side] || { texts: [] };
+    }
 
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
+    function updateSideDesign(side: PrintSide, newDesign: SideDesign) {
+        setDesigns((prev) => ({
+            ...prev,
+            [side]: newDesign,
+        }));
+    }
 
-        const shirtImage = new Image();
+    function handleImageUpload(
+        event: React.ChangeEvent<HTMLInputElement>,
+        side: PrintSide
+    ) {
+        const file = event.target.files?.[0];
+        if (!file) return;
 
-        shirtImage.src = shirtConfig?.colorFile
-            ? `/tshirts/${shirtConfig.colorFile}.png`
-            : "/tshirts/white.png";
+        const current = getSideDesign(side);
 
-        shirtImage.onload = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(shirtImage, 0, 0, canvas.width, canvas.height);
+        updateSideDesign(side, {
+            ...current,
+            image: {
+                src: URL.createObjectURL(file),
+                x: 50,
+                y: 50,
+                width: printAreas[side].defaultWidth,
+            },
+        });
 
-            if (!designText.trim()) return;
+        setSelectedGalleryIndex(
+            galleryImages.findIndex((item) => item.side === side)
+        );
+        setActiveElement("image");
+        event.target.value = "";
+    }
 
-            ctx.font = `bold ${fontSize}px ${font}`;
-            ctx.fillStyle = textColor;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
+    function addText(side: PrintSide) {
+        const id = crypto.randomUUID();
+        const current = getSideDesign(side);
 
-            const { x, y } = getTextPosition(canvas, position);
-
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate((rotate * Math.PI) / 180);
-
-            if (bend === 0) {
-                ctx.fillText(designText, 0, 0);
-            } else {
-                const isTop = bend > 0;
-                const absBend = Math.abs(bend);
-                const radius = Math.max(80, 280 - absBend);
-
-                drawArcText(ctx, designText, 0, 0, radius, isTop);
-            }
-
-            ctx.restore();
+        const newText: DesignText = {
+            id,
+            text: "Dein Text",
+            x: 50,
+            y: 50,
+            fontSize: 18,
+            color: "#111111",
+            font: "Arial, sans-serif",
+            rotate: 0,
+            bend: 0,
         };
-    }, [
-        designText, font, position, rotate, textColor, bend, fontSize, shirtConfig]);
+
+        updateSideDesign(side, {
+            ...current,
+            texts: [...current.texts, newText],
+        });
+
+        setActiveElement("text");
+        setActiveTextId(id);
+    }
+
+    function updateImage(changes: Partial<DesignImage>) {
+        const current = getSideDesign(selectedSide);
+        if (!current.image) return;
+
+        updateSideDesign(selectedSide, {
+            ...current,
+            image: {
+                ...current.image,
+                ...changes,
+            },
+        });
+    }
+
+    function updateActiveText(changes: Partial<DesignText>) {
+        if (!activeTextId) return;
+
+        const current = getSideDesign(selectedSide);
+
+        updateSideDesign(selectedSide, {
+            ...current,
+            texts: current.texts.map((text) =>
+                text.id === activeTextId ? { ...text, ...changes } : text
+            ),
+        });
+    }
+
+    function removeActiveElement() {
+        const current = getSideDesign(selectedSide);
+
+        if (activeElement === "image") {
+            updateSideDesign(selectedSide, {
+                ...current,
+                image: undefined,
+            });
+        }
+
+        if (activeElement === "text" && activeTextId) {
+            updateSideDesign(selectedSide, {
+                ...current,
+                texts: current.texts.filter((text) => text.id !== activeTextId),
+            });
+
+            setActiveTextId(null);
+        }
+    }
+
+    function handlePointerDown(
+        event: React.PointerEvent,
+        side: PrintSide,
+        element: ActiveElementType,
+        textId?: string
+    ) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        setActiveElement(element);
+
+        if (textId) {
+            setActiveTextId(textId);
+        }
+
+        setDragData({ side, element, textId });
+    }
+
+    function handlePointerMove(event: React.PointerEvent<HTMLDivElement>) {
+        if (!dragData) return;
+
+        const rect = event.currentTarget.getBoundingClientRect();
+
+        const x = ((event.clientX - rect.left) / rect.width) * 100;
+        const y = ((event.clientY - rect.top) / rect.height) * 100;
+
+        const cleanX = Math.min(95, Math.max(5, x));
+        const cleanY = Math.min(95, Math.max(5, y));
+
+        const current = getSideDesign(dragData.side);
+
+        if (dragData.element === "image" && current.image) {
+            updateSideDesign(dragData.side, {
+                ...current,
+                image: {
+                    ...current.image,
+                    x: cleanX,
+                    y: cleanY,
+                },
+            });
+        }
+
+        if (dragData.element === "text" && dragData.textId) {
+            updateSideDesign(dragData.side, {
+                ...current,
+                texts: current.texts.map((text) =>
+                    text.id === dragData.textId
+                        ? { ...text, x: cleanX, y: cleanY }
+                        : text
+                ),
+            });
+        }
+    }
+
+    function handlePointerUp() {
+        setDragData(null);
+    }
 
     function handleAddToCart() {
-        const canvas = canvasRef.current;
-
-        if (!canvas) {
-            alert("Canvas wurde nicht gefunden");
-            return;
-        }
-
         if (!shirtConfig) {
-            alert("T-Shirt Daten wurden nicht gefunden");
+            alert("T-Shirt Daten wurden nicht gefunden.");
             return;
         }
-
-        const previewImage = canvas.toDataURL("image/png");
 
         const cartItem: CartItem = {
             id: Date.now(),
@@ -184,151 +446,292 @@ export default function DesignPage() {
             color: shirtConfig.color,
             colorFile: shirtConfig.colorFile,
             size: shirtConfig.size,
-            customText: designText,
-            description: shirtConfig.description,
-            font: font,
-            fontSize: fontSize,
-            textColor: textColor,
-            position: position,
-            rotate: rotate,
-            bend: bend,
             price: shirtConfig.price,
-            previewImage: previewImage,
-            quantity: 1
+            quantity: 1,
+            designData: designs,
         };
 
         const existingCart = localStorage.getItem("cart");
         const cart: CartItem[] = existingCart ? JSON.parse(existingCart) : [];
 
         cart.push(cartItem);
-
         localStorage.setItem("cart", JSON.stringify(cart));
 
-        alert("Produkt wurde zum Warenkorb hinzugefügt");
+        router.push("/warenkorb");
+    }
 
-        router.push("/");
+    if (!shirtConfig) {
+        return (
+            <main className="designPage">
+                <h1>Keine T-Shirt Daten gefunden</h1>
+                <Link href="/t-shirt" className="topCartButton">
+                    Zurück
+                </Link>
+            </main>
+        );
     }
 
     return (
-        <div className="designPage">
+        <main className="designPage">
             <div className="designTopBar">
-                <h1>Design dein T-Shirt</h1>
+                <h1>Online Designer</h1>
 
                 <Link href="/warenkorb" className="topCartButton">
                     Zum Warenkorb
                 </Link>
             </div>
 
-
             <div className="designLayout">
-                <div className="controlPanel">
-                    <div className="textInput">
-                        <label>Text</label>
-                        <textarea
-                            value={designText}
-                            onChange={(e) => setDesignText(e.target.value)}
-                            placeholder="Schreib deinen Text hier"
-                        />
+                <section className="controlPanel">
+                    <div className="designerSection">
+                        <h2>Seite auswählen</h2>
+
+                        <div className="sideTabs">
+                            {galleryImages
+                                .filter((item) => item.side !== "detail")
+                                .map((item, index) => (
+                                    <button
+                                        key={item.side}
+                                        type="button"
+                                        className={
+                                            selectedGalleryIndex === index ? "activeSideTab" : ""
+                                        }
+                                        onClick={() => setSelectedGalleryIndex(index)}
+                                    >
+                                        {sideLabels[item.side]}
+                                    </button>
+                                ))}
+                        </div>
                     </div>
 
-                    <div className="fontSelection">
-                        <label>Schriftart</label>
-                        <select
-                            onChange={(e) => setFont(e.target.value)}
-                            value={font}
-                        >
-                            <option value="sans-serif">Sans Serif</option>
-                            <option value="serif">Serif</option>
-                            <option value="monospace">Monospace</option>
-                        </select>
-                    </div>
+                    <div className="designerSection">
+                        <h2>Bild hochladen</h2>
 
-                    <div className="fontSizeSelection">
-                        <label>Schriftgröße: {fontSize}px</label>
-                        <input
-                            className="customSlider"
-                            type="range"
-                            min="12"
-                            max="80"
-                            value={fontSize}
-                            onChange={(e) => setFontSize(Number(e.target.value))}
-                        />
-                    </div>
-
-                    <div className="positionSelection">
-                        <label>Position</label>
-                        <select
-                            onChange={(e) => setPosition(e.target.value)}
-                            value={position}
-                        >
-                            <option value="center">Zentrum</option>
-                            <option value="top-left">Oben links</option>
-                            <option value="top-right">Oben rechts</option>
-                            <option value="bottom-left">Unten links</option>
-                            <option value="bottom-right">Unten rechts</option>
-                        </select>
-                    </div>
-
-                    <div className="rotationSelection">
-                        <label>Drehung: {rotate}°</label>
-                        <input
-                            className="customSlider"
-                            type="range"
-                            min="0"
-                            max="360"
-                            value={rotate}
-                            onChange={(e) => setRotate(Number(e.target.value))}
-                        />
-                    </div>
-
-                    <div className="bendSelection">
-                        <label>Biegen: {bend}</label>
-                        <input
-                            className="customSlider"
-                            type="range"
-                            min="-180"
-                            max="180"
-                            value={bend}
-                            onChange={(e) => setBend(Number(e.target.value))}
-                        />
-                    </div>
-
-                    <div className="colorSelection">
-                        <label>Text Farbe</label>
-
-                        <label className="colorPickerIcon">
-                            <span className="pickerSymbol">🖌</span>
-
+                        <label className="designerUploadBox">
+                            Datei auswählen
                             <input
-                                type="color"
-                                value={textColor}
-                                onChange={(e) => setTextColor(e.target.value)}
-                                className="hiddenColorInput"
+                                type="file"
+                                accept="image/*"
+                                onChange={(event) => handleImageUpload(event, selectedSide)}
                             />
                         </label>
-
-                        <span className="selectedColorText">{textColor}</span>
                     </div>
+
+                    <div className="designerSection">
+                        <h2>Texte hinzufügen und bearbeiten</h2>
+
+                        <button
+                            type="button"
+                            className="secondaryButton"
+                            onClick={() => addText(selectedSide)}
+                        >
+                            Text hinzufügen
+                        </button>
+
+                        <p className="designerHint">
+                            Sie können mehrere Texte hinzufügen. Klicken Sie auf einen Text im
+                            T-Shirt oder in der Liste, um ihn zu bearbeiten.
+                        </p>
+
+                        {selectedDesign.texts.length > 0 && (
+                            <div className="textList">
+                                {selectedDesign.texts.map((text, index) => (
+                                    <button
+                                        key={text.id}
+                                        type="button"
+                                        className={`textListItem ${
+                                            activeTextId === text.id ? "activeTextListItem" : ""
+                                        }`}
+                                        onClick={() => {
+                                            setActiveElement("text");
+                                            setActiveTextId(text.id);
+                                        }}
+                                    >
+                                        Text {index + 1}: {text.text}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        {activeText && (
+                            <>
+                <textarea
+                    value={activeText.text}
+                    onChange={(e) => updateActiveText({ text: e.target.value })}
+                    placeholder="Schreib deinen Text hier"
+                />
+
+                                <label>Schriftart</label>
+                                <select
+                                    value={activeText.font}
+                                    onChange={(e) => updateActiveText({ font: e.target.value })}
+                                >
+                                    {fontOptions.map((font) => (
+                                        <option key={font.value} value={font.value}>
+                                            {font.label}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                <label>Schriftgröße: {activeText.fontSize}</label>
+                                <input
+                                    className="customSlider"
+                                    type="range"
+                                    min="8"
+                                    max="48"
+                                    value={activeText.fontSize}
+                                    onChange={(e) =>
+                                        updateActiveText({ fontSize: Number(e.target.value) })
+                                    }
+                                />
+
+                                <label>Drehung: {activeText.rotate}°</label>
+                                <input
+                                    className="customSlider"
+                                    type="range"
+                                    min="-180"
+                                    max="180"
+                                    value={activeText.rotate}
+                                    onChange={(e) =>
+                                        updateActiveText({ rotate: Number(e.target.value) })
+                                    }
+                                />
+
+                                <label>Biegen: {activeText.bend}</label>
+                                <input
+                                    className="customSlider"
+                                    type="range"
+                                    min="-160"
+                                    max="160"
+                                    value={activeText.bend}
+                                    onChange={(e) =>
+                                        updateActiveText({ bend: Number(e.target.value) })
+                                    }
+                                />
+
+                                <label>Text Farbe</label>
+                                <input
+                                    type="color"
+                                    value={activeText.color}
+                                    onChange={(e) => updateActiveText({ color: e.target.value })}
+                                    className="normalColorInput"
+                                />
+                            </>
+                        )}
+                    </div>
+
+                    {activeElement === "image" && selectedDesign.image && (
+                        <div className="designerSection">
+                            <h2>Bild bearbeiten</h2>
+
+                            <label>Bildgröße: {selectedDesign.image.width}%</label>
+                            <input
+                                className="customSlider"
+                                type="range"
+                                min={selectedPrintArea.minWidth}
+                                max={selectedPrintArea.maxWidth}
+                                value={selectedDesign.image.width}
+                                onChange={(e) => updateImage({ width: Number(e.target.value) })}
+                            />
+
+                            <button
+                                type="button"
+                                className="removeDesignerButton"
+                                onClick={removeActiveElement}
+                            >
+                                Bild entfernen
+                            </button>
+                        </div>
+                    )}
+
+                    {activeElement === "text" && activeText && (
+                        <div className="designerSection">
+                            <h2>Text entfernen</h2>
+
+                            <button
+                                type="button"
+                                className="removeDesignerButton"
+                                onClick={removeActiveElement}
+                            >
+                                Text entfernen
+                            </button>
+                        </div>
+                    )}
 
                     <button className="cartButton" onClick={handleAddToCart}>
                         Zum Warenkorb hinzufügen
                     </button>
-                </div>
+                </section>
 
-                <div className="previewPanel">
-                    <div className="tshirtPreview">
-                        <canvas
-                            ref={canvasRef}
-                            width={500}
-                            height={500}
-                            style={{
-                                border: "1px solid #ddd",
-                                backgroundColor: "#fff"
-                            }}
-                        />
+                <section className="previewPanel">
+                    <div className="designerPreview">
+                        <div className="shirtStage">
+                            <img
+                                src={galleryImages[selectedGalleryIndex].src}
+                                alt={galleryImages[selectedGalleryIndex].alt}
+                                className="designerTshirtImage"
+                            />
+
+                            {selectedSide !== "detail" && (
+                                <div
+                                    className="printArea"
+                                    style={{
+                                        left: `${selectedPrintArea.left}%`,
+                                        top: `${selectedPrintArea.top}%`,
+                                        width: `${selectedPrintArea.width}%`,
+                                        height: `${selectedPrintArea.height}%`,
+                                    }}
+                                    onPointerMove={handlePointerMove}
+                                    onPointerUp={handlePointerUp}
+                                    onPointerLeave={handlePointerUp}
+                                >
+                                    {selectedDesign.image && (
+                                        <img
+                                            src={selectedDesign.image.src}
+                                            alt="Design"
+                                            className={`designerObject ${
+                                                activeElement === "image" ? "activeDesignerObject" : ""
+                                            }`}
+                                            onPointerDown={(event) =>
+                                                handlePointerDown(event, selectedSide, "image")
+                                            }
+                                            style={{
+                                                width: `${selectedDesign.image.width}%`,
+                                                left: `${selectedDesign.image.x}%`,
+                                                top: `${selectedDesign.image.y}%`,
+                                            }}
+                                        />
+                                    )}
+
+                                    {selectedDesign.texts.map((text) => (
+                                        <div
+                                            key={text.id}
+                                            className={`designerText ${
+                                                activeElement === "text" && activeTextId === text.id
+                                                    ? "activeDesignerObject"
+                                                    : ""
+                                            }`}
+                                            onPointerDown={(event) =>
+                                                handlePointerDown(event, selectedSide, "text", text.id)
+                                            }
+                                            style={{
+                                                left: `${text.x}%`,
+                                                top: `${text.y}%`,
+                                                color: text.color,
+                                                fontSize: `${text.fontSize}px`,
+                                                fontFamily: text.font,
+                                                transform: `translate(-50%, -50%) rotate(${text.rotate}deg)`,
+                                            }}
+                                        >
+                                            <ArcText text={text} />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
+                </section>
             </div>
-        </div>
+        </main>
     );
 }

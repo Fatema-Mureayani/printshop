@@ -1,243 +1,585 @@
 .tshirtPage {
   min-height: 100vh;
-  background-color: #111111; /* خلفية سوداء */
-  color: white; /* الكتابة بيضاء */
+  background: #f5f5f5;
+  color: #111111;
   display: grid;
-  grid-template-columns: 58% 42%;
-  gap: 40px;
+  grid-template-columns: 30% 44% 24%;
+  gap: 24px;
   padding: 40px;
+  font-family: Arial, sans-serif;
 }
 
-.tshirtGallery {
-  display: flex;
-  gap: 25px;
-  align-items: flex-start;
+.tshirtGalleryCard {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 16px;
+  padding: 24px;
+  height: fit-content;
 }
 
-.thumbnailList {
-  width: 90px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.thumbnailList img {
-  width: 80px;
-  height: 100px;
-  object-fit: contain;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 5px;
+.tshirtGalleryCard h1 {
+  font-size: 38px;
+  line-height: 1.05;
+  margin: 0 0 24px;
+  color: #111111;
 }
 
 .mainPreview {
   position: relative;
   width: 100%;
-  height: 700px; /* تكبير الصورة */
+  height: 430px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fafafa;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: zoom-in;
+}
+
+.shirtStage {
+  position: relative;
+  width: clamp(260px, 70%, 430px);
+}
+
+.tshirtPageImage,
+.modalTshirtImage {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.printArea {
+  position: absolute;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.printArea::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px dashed rgba(212, 175, 55, 0.55);
+  pointer-events: none;
+  border-radius: 4px;
+}
+
+.designOnShirt,
+.draggableDesign {
+  position: absolute;
+  z-index: 6;
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  object-fit: contain;
+  max-width: 95%;
+  max-height: 95%;
+}
+
+.draggableDesign:active {
+  cursor: grabbing;
+}
+
+.previewModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 24px;
+}
+
+.previewModalContent {
+  position: relative;
+  width: min(90vw, 1000px);
+  max-height: 90vh;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 30px;
+  overflow: auto;
+}
+
+.previewModalClose {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: #111111;
+  color: #ffffff;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.modalPreview {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalShirtStage {
+  position: relative;
+  width: min(70vw, 650px);
+}
+
+.previewModal .printArea {
+  z-index: 10;
+}
+
+.thumbnailList {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.thumbnailButton {
+  position: relative;
+  width: 31%;
+  height: 90px;
+  background: #ffffff;
+  border: 2px solid #dddddd;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 6px;
+}
+
+.thumbnailButton img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.selectedThumbnail {
+  border-color: #d4af37;
+}
+
+.thumbnailHasDesign {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: #15803d;
+  color: #ffffff;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 900;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #fafafa;
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.tshirtPageImage {
-  position: relative;
-  z-index: 2;
-  max-height: 620px;
-  max-width: 100%;
-  object-fit: contain;
-}
-
-.designOnShirt {
-  position: absolute;
-  z-index: 3;
-  width: 110px;
-  top: 250px;
-  left: 50%;
-  transform: translateX(-50%);
-  object-fit: contain;
 }
 
 .tshirtConfig {
-  padding: 30px;
-  color: white; /* النص الأبيض */
+  background: #ffffff;
+  border-left: 1px solid #e2e2e2;
+  border-right: 1px solid #e2e2e2;
+  padding: 0 30px 40px;
 }
 
-.tshirtConfig h1 {
-  font-size: 34px;
-  margin-bottom: 12px;
-  color: #facc15; /* الأصفر للنص */
+.tshirtConfig h2 {
+  font-size: 30px;
+  margin: 0 0 32px;
+  color: #111111;
 }
 
 .configBlock {
-  margin-bottom: 28px;
+  margin-bottom: 30px;
 }
 
-.configBlock h3 {
+.configBlock h3,
+.uploadPanel h3,
+.servicePanel h3 {
+  font-size: 20px;
+  margin: 0 0 14px;
+  color: #111111;
+}
+
+.choiceGrid {
+  display: grid;
+  gap: 14px;
+}
+
+.twoColumns {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.choiceButton,
+.sizeButton {
+  min-height: 58px;
+  background: #ffffff;
+  border: 2px solid #dddddd;
+  border-radius: 10px;
   font-size: 17px;
-  margin-bottom: 12px;
-  color: #facc15; /* الأصفر */
+  font-weight: 800;
+  color: #111111;
+  cursor: pointer;
+}
+
+.activeChoice {
+  border-color: #d4af37 !important;
+  background: #fffdf4 !important;
+  color: #d4af37 !important;
 }
 
 .colorGrid {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  max-width: 520px;
+  max-width: 620px;
 }
 
 .colorButton {
-  width: 34px;
-  height: 34px;
-  border-radius: 6px;
-  border: 1px solid #bbb;
+  width: 38px;
+  height: 38px;
+  border-radius: 7px;
+  border: 1px solid #aaaaaa;
   cursor: pointer;
 }
 
-.colorButton.selected {
-  outline: 3px solid #facc15;
-  outline-offset: 3px;
+.selectedColor {
+  outline: 3px solid #d4af37;
+  outline-offset: 4px;
+}
+
+.selectedText {
+  margin: 12px 0 0;
+  font-size: 15px;
+  color: #555555;
 }
 
 .sizeGrid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
 }
 
-.sizeGrid button {
-  min-width: 58px;
-  padding: 14px 16px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 7px;
-  font-weight: 800;
-  font-size: 16px;
-  cursor: pointer;
-  color: black; /* تغيير النص ليصبح باللون الأسود */
+.druckdatenGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
 }
 
-.selectedSize {
-  border: 2px solid #111 !important;
-  color: black; /* جعل النص في الزر المحدد باللون الأسود */
-}
-
-.uploadBox {
-  display: inline-block;
-  background: #f44336; /* اللون الأحمر */
-  color: white;
-  padding: 18px 32px;
+.druckdatenCard {
+  position: relative;
+  min-height: 210px;
+  background: #ffffff;
+  border: 2px solid #dddddd;
   border-radius: 14px;
-  font-weight: 800;
+  padding: 22px 18px;
+  text-align: center;
+  cursor: pointer;
+  color: #111111;
+}
+
+.radioCircle {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #dddddd;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.activeChoice .radioCircle {
+  border: 6px solid #d4af37;
+}
+
+.druckIcon {
+  display: block;
+  font-size: 38px;
+  margin-bottom: 22px;
+  color: #111111;
+}
+
+.druckdatenCard strong {
+  display: block;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.druckdatenCard p {
+  min-height: 44px;
+  margin: 0 0 22px;
+  color: #666666;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.druckdatenCard b {
+  font-size: 16px;
+}
+
+.uploadPanel,
+.servicePanel {
+  background: #fffdf8;
+  border: 1px solid #e6e1d5;
+  border-radius: 14px;
+  padding: 20px;
+  margin-top: 18px;
+  max-width: 360px;
+}
+
+.uploadPanelWide {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.fileUploadBox {
+  display: inline-block;
+  border: 2px dashed #cfcfcf;
+  border-radius: 12px;
+  padding: 16px 24px;
+  background: #ffffff;
+  font-weight: 700;
   cursor: pointer;
 }
 
-.uploadBox input {
+.fileUploadBox input {
   display: none;
 }
 
-.priceBox {
-  margin-top: 20px;
-  background: #222222; /* خلفية رمادية */
+.uploadSuccess {
+  margin: 12px 0 0;
+  color: #15803d;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.sideUploadGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.sideUploadCard {
+  min-width: 0;
+  border: 2px solid #dddddd;
   border-radius: 12px;
-  padding: 20px;
-  width: 220px;
+  padding: 12px;
+  background: #ffffff;
 }
 
-.priceBox p {
-  color: white;
-  margin-bottom: 8px;
+.activeSideUpload {
+  border-color: #d4af37;
+  background: #fffdf4;
 }
 
-.priceBox strong {
-  font-size: 28px;
-}
-
-.startDesignButton {
-  margin-top: 25px;
+.sideChooseButton {
   width: 100%;
-  padding: 20px;
   border: none;
+  background: transparent;
+  color: #111111;
+  font-size: 15px;
+  font-weight: 900;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.smallUploadBox {
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  padding: 12px 8px;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.uploadHint {
+  margin: 14px 0 0;
+  color: #666666;
+  font-size: 14px;
+}
+
+.fieldLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #111111;
+}
+
+.textInputField,
+.descriptionInput {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #111111;
+  background: #ffffff;
+}
+
+.textInputField:focus,
+.descriptionInput:focus {
+  outline: none;
+  border-color: #d4af37;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.18);
+}
+
+.descriptionInput {
+  resize: vertical;
+}
+
+.designControlBox,
+.modalControls {
+  margin-top: 16px;
+  background: #fffdf8;
+  border: 1px solid #e6e1d5;
   border-radius: 12px;
-  background: #f44336; /* اللون الأحمر */
-  color: white;
-  font-size: 20px;
+  padding: 14px;
+}
+
+.designControlBox strong,
+.modalControls strong {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+.designControlBox label,
+.modalControls label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.designControlBox input[type="range"],
+.modalControls input[type="range"] {
+  width: 100%;
+}
+
+.removeDesignButton,
+.removeSmallButton {
+  width: 100%;
+  margin-top: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #dc2626;
+  color: #ffffff;
+  padding: 9px 10px;
+  font-size: 13px;
   font-weight: 800;
   cursor: pointer;
 }
 
-.startDesignButton:disabled {
-  background: #f3a1a7;
-  cursor: not-allowed;
-}
-/* ملاحظة الخدمة */
-.serviceNote {
-  background-color: #f0f9ff;
-  border-left: 4px solid #3b82f6;
-  padding: 12px 16px;
-  margin: 20px 0;
-  border-radius: 8px;
-}
-
-.serviceText {
-  color: #1e40af;
-  font-weight: 500;
-  margin: 0;
-  font-size: 14px;
+.summaryCard {
+  background: #ffffff;
+  border: 1px solid #e2e2e2;
+  border-radius: 16px;
+  padding: 22px;
+  height: fit-content;
+  position: sticky;
+  top: 30px;
+  max-width: 330px;
+  overflow: hidden;
 }
 
-/* حقول إدخال النص */
-.textInputLabel,
-.descriptionLabel {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-weight: 500;
-  color: #374151;
+.summaryCard h2 {
+  font-size: 28px;
+  margin: 0 0 20px;
+  color: #111111;
 }
 
-.textInputField {
-  padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: border-color 0.2s;
+.summaryRow {
+  display: grid;
+  grid-template-columns: 42% 58%;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eeeeee;
+  font-size: 15px;
+  align-items: center;
 }
 
-.textInputField:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+.summaryRow span {
+  color: #666666;
 }
 
-.descriptionInput {
-  padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: inherit;
-  resize: vertical;
-  transition: border-color 0.2s;
+.summaryRow strong {
+  color: #111111;
+  text-align: right;
+  font-size: 15px;
+  font-weight: 800;
+  white-space: normal;
+  word-break: break-word;
 }
 
-.descriptionInput:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+.summaryCard .cartButton,
+.tshirtPage .cartButton {
+  width: 100% !important;
+  margin-top: 24px !important;
+  padding: 17px !important;
+  border: none !important;
+  border-radius: 10px !important;
+  background-color: #d4af37 !important;
+  color: #111111 !important;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  cursor: pointer !important;
+  appearance: none;
 }
 
-.inputHint {
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 4px;
-  margin-bottom: 0;
+.summaryCard .cartButton:hover,
+.tshirtPage .cartButton:hover {
+  background-color: #c9a928 !important;
 }
 
-.uploadSuccess {
-  color: #10b981;
-  font-size: 14px;
-  margin-top: 8px;
-  font-weight: 500;
+@media (max-width: 1200px) {
+  .tshirtPage {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryCard {
+    position: static;
+    max-width: none;
+  }
+
+  .tshirtConfig {
+    border: none;
+    padding: 24px;
+  }
+}
+
+@media (max-width: 700px) {
+  .tshirtPage {
+    padding: 18px;
+  }
+
+  .mainPreview {
+    height: 360px;
+  }
+
+  .previewModal {
+    padding: 12px;
+  }
+
+  .previewModalContent {
+    width: 96vw;
+    padding: 16px;
+  }
+
+  .modalPreview {
+    min-height: 520px;
+  }
+
+  .sideUploadGrid,
+  .druckdatenGrid,
+  .sizeGrid,
+  .twoColumns {
+    grid-template-columns: 1fr;
+  }
+
+  .tshirtGalleryCard h1 {
+    font-size: 30px;
+  }
 }
