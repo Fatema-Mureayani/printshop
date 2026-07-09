@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { toPng } from "html-to-image";
 
 const colors = [
     { name: "Weiß", file: "white", hex: "#ffffff" },
@@ -32,6 +33,8 @@ type PrintSide = "front" | "back"  | "side-left" | "side-right" | "detail";
 
 type UploadedDesign = {
     src: string;
+    fileName?: string;
+    fileUrl?: string;
     x: number; // %
     y: number; // %
     width: number; // %
@@ -124,6 +127,8 @@ export default function TShirtPage() {
 
     const selectedShirtImage = `/tshirts/${selectedColor.file}.png`;
 
+    const previewRef = useRef<HTMLDivElement | null>(null);
+
     const galleryImages: { side: PrintSide; src: string; alt: string }[] = [
         {
             side:"front",
@@ -164,15 +169,23 @@ export default function TShirtPage() {
         const file = event.target.files?.[0];
         if (!file) return;
 
-        setDesigns((prev) => ({
-            ...prev,
-            [side]: {
-                src: URL.createObjectURL(file),
-                x: 50,
-                y: 50,
-                width: printAreas[side].defaultDesignWidth,
-            },
-        }));
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            const imageSrc = reader.result as string;
+
+            setDesigns((prev) => ({
+                ...prev,
+                [side]: {
+                    src: imageSrc,
+                    x: 50,
+                    y: 50,
+                    width: printAreas[side].defaultDesignWidth,
+                },
+            }));
+        };
+
+        reader.readAsDataURL(file);
 
         event.target.value = "";
     }
@@ -245,17 +258,95 @@ export default function TShirtPage() {
         window.location.href = "/t-shirt/design";
     }
 
+    async function uploadPreviewImage(dataUrl: string) {
+        const blob = await fetch(dataUrl).then((res) => res.blob());
+
+        const file = new File([blob], `tshirt-preview-${Date.now()}.png`, {
+            type: "image/png",
+        });
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await fetch("http://localhost:5098/api/Uploads/tshirt-design", {
+            method: "POST",
+            body: formData,
+        });
+
+        if (!res.ok) {
+            throw new Error("Preview konnte nicht hochgeladen werden.");
+        }
+
+        return await res.json();
+    }
+
+    async function handleAddToCart() {
+        try {
+            let designerPreviewFront: string | undefined = undefined;
+
+            if (previewRef.current) {
+                const dataUrl = await toPng(previewRef.current, {
+                    pixelRatio: 2,
+                    fontEmbedCSS: "",
+                });
+
+                const uploadedPreview = await uploadPreviewImage(dataUrl);
+                designerPreviewFront = uploadedPreview.fileUrl;
+            }
+
+            const cartItem = {
+                id: Date.now(),
+                productId: 1,
+                productName: "Klassisches Unisex T-Shirt",
+                color: selectedColor.name,
+                colorFile: selectedColor.file,
+                size: selectedSize,
+                price: totalPrice,
+                quantity: 1,
+                customText: textInput,
+                description,
+                druckdatenOption: selectedDruckdaten,
+                designWishes: description,
+                designs,
+                designerPreviewFront,
+                designerJson: JSON.stringify({
+                    designs,
+                    printAreas,
+                }),
+                previewImage: designerPreviewFront
+                    ? `http://localhost:5098${designerPreviewFront}`
+                    : selectedShirtImage,
+            };
+
+            const existingCart = localStorage.getItem("cart");
+            const cart = existingCart ? JSON.parse(existingCart) : [];
+
+            cart.push(cartItem);
+            localStorage.setItem("cart", JSON.stringify(cart));
+
+            window.location.href = "/warenkorb";
+        } catch (error) {
+            console.error("Fehler beim Erstellen der Vorschau:", error);
+            console.error(error);
+            alert(error instanceof Error ? error.message : JSON.stringify(error));
+        }
+    }
+
     return (
         <main className="tshirtPage">
             <section className="tshirtGalleryCard">
                 <h1>Klassisches Unisex T-Shirt</h1>
 
-                <div className="mainPreview largePreview" onClick={() => setIsPreviewOpen(true)}>
-                    <div className="shirtStage">
+                <div
+                    className="mainPreview largePreview"
+                    onClick={() => setIsPreviewOpen(true)}
+                >
+                    <div ref={previewRef} className="shirtStage">
                         <img
                             src={galleryImages[selectedGalleryIndex].src}
                             alt={galleryImages[selectedGalleryIndex].alt}
                             className="tshirtPageImage"
+                            crossOrigin="anonymous"
                         />
 
                         {selectedSide !== "detail" && (
@@ -276,6 +367,7 @@ export default function TShirtPage() {
                                         src={selectedDesign.src}
                                         alt="Design Vorschau"
                                         className="designOnShirt draggableDesign"
+                                        crossOrigin="anonymous"
                                         onPointerDown={(event) => handlePointerDown(event, selectedSide)}
                                         style={{
                                             width: `${selectedDesign.width}%`,
@@ -574,7 +666,7 @@ export default function TShirtPage() {
                         Mit Design beginnen
                     </button>
                 ) : (
-                    <button className="cartButton" type="button">
+                    <button className="cartButton" type="button" onClick={handleAddToCart}>
                         In den Warenkorb
                     </button>
                 )}

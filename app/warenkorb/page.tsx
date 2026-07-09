@@ -19,6 +19,8 @@ type CartItem = {
     designerPreviewFront?: string;
     designerPreviewBack?: string;
     designerJson?: string;
+    designData?: unknown; // t-shirt
+    designs?: unknown;  // t-shirt
     font: string;
     fontSize: number;
     textColor: string;
@@ -140,7 +142,7 @@ export default function WarenkorbPage() {
                     designWishes: item.designWishes,
                     designerPreviewFront: item.designerPreviewFront,
                     designerPreviewBack: item.designerPreviewBack,
-                    designerJson: item.designerJson,
+                    designerJson: item.designerJson ?? JSON.stringify(item.designs ?? {}),
                     font: item.font,
                     fontSize: item.fontSize,
                     textColor: item.textColor,
@@ -211,7 +213,11 @@ export default function WarenkorbPage() {
                         {cart.map((item) => (
                             <div key={item.id} className="cartItem">
                                 <img
-                                    src={item.previewImage}
+                                    src={
+                                        item.designerPreviewFront
+                                            ? `http://localhost:5098${item.designerPreviewFront}`
+                                            : item.previewImage
+                                    }
                                     alt="T-Shirt Vorschau"
                                     className="cartPreviewImage"
                                 />
