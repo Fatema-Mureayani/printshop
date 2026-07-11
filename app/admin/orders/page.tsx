@@ -63,6 +63,7 @@ export default function AdminOrdersPage() {
             }
 
             const data = await res.json();
+            console.log("Orders API data:", data);
             setOrders(data);
         } catch (error) {
             console.error(error);
@@ -460,6 +461,52 @@ export default function AdminOrdersPage() {
                                                                         <strong>Preis:</strong>{" "}
                                                                         {Number(item.price).toFixed(2).replace(".", ",")} €
                                                                     </p>
+
+                                                                    {item.designerPreviewFront && (
+                                                                        <div className="adminDruckdatenPreviewBox">
+                                                                            <p>
+                                                                                <strong>T-Shirt Design Vorschau:</strong>
+                                                                            </p>
+
+                                                                            <a
+                                                                                href={`http://localhost:5098${item.designerPreviewFront}`}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                            >
+                                                                                <img
+                                                                                    src={`http://localhost:5098${item.designerPreviewFront}`}
+                                                                                    alt="T-Shirt Design Vorschau"
+                                                                                    className="adminDruckdatenPreview"
+                                                                                />
+                                                                            </a>
+                                                                        </div>
+                                                                    )}
+
+                                                                    {item.designerPreviewBack && (
+                                                                        <div className="adminDruckdatenPreviewBox">
+                                                                            <p>
+                                                                                <strong>T-Shirt Rückseite:</strong>
+                                                                            </p>
+
+                                                                            <a
+                                                                                href={`http://localhost:5098${item.designerPreviewBack}`}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                            >
+                                                                                <img
+                                                                                    src={`http://localhost:5098${item.designerPreviewBack}`}
+                                                                                    alt="T-Shirt Rückseite"
+                                                                                    className="adminDruckdatenPreview"
+                                                                                />
+                                                                            </a>
+                                                                        </div>
+                                                                    )}
+
+                                                                    {item.designerJson && (
+                                                                        <p>
+                                                                            <strong>Designer-Daten:</strong> vorhanden
+                                                                        </p>
+                                                                    )}
                                                                 </div>
                                                             )}
                                                         </div>
