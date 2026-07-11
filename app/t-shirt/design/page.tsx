@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toPng } from "html-to-image";
 
 type PrintSide = "front" | "back" | "side-left" | "side-right" | "detail";
 type ActiveElementType = "image" | "text";
@@ -52,6 +53,10 @@ type CartItem = {
     size: string;
     price: number;
     quantity: number;
+    previewImage?: string;
+    designerPreviewFront?: string;
+    designerPreviewBack?: string;
+    designerJson?: string;
     designData: Partial<Record<PrintSide, SideDesign>>;
 };
 
@@ -230,6 +235,8 @@ export default function DesignPage() {
     const selectedSide = galleryImages[selectedGalleryIndex].side;
     const selectedPrintArea = printAreas[selectedSide];
     const selectedDesign = designs[selectedSide] || { texts: [] };
+
+    const previewRef = useRef<HTMLDivElement | null>(null);
 
     const activeText =
         selectedDesign.texts.find((text) => text.id === activeTextId) || null;
@@ -433,31 +440,73 @@ export default function DesignPage() {
         setDragData(null);
     }
 
-    function handleAddToCart() {
+    async function handleAddToCart() {
         if (!shirtConfig) {
             alert("T-Shirt Daten wurden nicht gefunden.");
             return;
         }
 
-        const cartItem: CartItem = {
-            id: Date.now(),
-            productId: shirtConfig.productId,
-            productName: shirtConfig.productName,
-            color: shirtConfig.color,
-            colorFile: shirtConfig.colorFile,
-            size: shirtConfig.size,
-            price: shirtConfig.price,
-            quantity: 1,
-            designData: designs,
-        };
+        if (!previewRef.current) {
+            alert("T-Shirt Vorschau konnte nicht erstellt werden.");
+            return;
+        }
 
-        const existingCart = localStorage.getItem("cart");
-        const cart: CartItem[] = existingCart ? JSON.parse(existingCart) : [];
+        try {
+            const dataUrl = await toPng(previewRef.current, {
+                pixelRatio: 2,
+                fontEmbedCSS: "",
+            });
 
-        cart.push(cartItem);
-        localStorage.setItem("cart", JSON.stringify(cart));
+            const blob = await fetch(dataUrl).then((res) => res.blob());
 
-        router.push("/warenkorb");
+            const formData = new FormData();
+            formData.append("file", blob, "tshirt-preview.png");
+
+            const res = await fetch("http://localhost:5098/api/Uploads/tshirt-design", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!res.ok) {
+                console.log(await res.text());
+                alert("Fehler beim Hochladen der T-Shirt Vorschau.");
+                return;
+            }
+
+            const uploadedPreview = await res.json();
+
+            const cartItem: CartItem = {
+                id: Date.now(),
+                productId: shirtConfig.productId,
+                productName: shirtConfig.productName,
+                color: shirtConfig.color,
+                colorFile: shirtConfig.colorFile,
+                size: shirtConfig.size,
+                price: shirtConfig.price,
+                quantity: 1,
+
+                previewImage: `/tshirts/${shirtConfig.colorFile}.png`,
+                designerPreviewFront: uploadedPreview.fileUrl,
+
+                designerJson: JSON.stringify({
+                    designs,
+                    printAreas,
+                }),
+
+                designData: designs,
+            };
+
+            const existingCart = localStorage.getItem("cart");
+            const cart: CartItem[] = existingCart ? JSON.parse(existingCart) : [];
+
+            cart.push(cartItem);
+            localStorage.setItem("cart", JSON.stringify(cart));
+
+            router.push("/warenkorb");
+        } catch (error) {
+            console.error(error);
+            alert("Fehler beim Erstellen der T-Shirt Vorschau.");
+        }
     }
 
     if (!shirtConfig) {
@@ -665,7 +714,7 @@ export default function DesignPage() {
 
                 <section className="previewPanel">
                     <div className="designerPreview">
-                        <div className="shirtStage">
+                        <div className="shirtStage" ref={previewRef}>
                             <img
                                 src={galleryImages[selectedGalleryIndex].src}
                                 alt={galleryImages[selectedGalleryIndex].alt}
